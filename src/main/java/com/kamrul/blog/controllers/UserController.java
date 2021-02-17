@@ -25,9 +25,6 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
     @GetMapping("/details")
     public ResponseEntity<?> getUserDetails(@RequestParam(value = "id") Long userId)
             throws ResourceNotFoundException {
@@ -53,22 +50,6 @@ public class UserController {
         return new ResponseEntity<>(posts,HttpStatus.OK);
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO)
-    {
-        User user=new User();
-        user.setUserName(userDTO.getUsername());
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
-        user.setEmail(userDTO.getEmail());
-        user.setDateOfBirth(userDTO.getDateOfBirth());
-
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-
-        userRepository.save(user);
-
-        return new ResponseEntity<>(user,HttpStatus.ACCEPTED);
-    }
 
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO)

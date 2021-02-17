@@ -4,6 +4,7 @@ public class PostDTO {
 
     private Long postId;
     private String postText;
+    private String postTitle;
 
     public String getPostText() {
         return postText;
@@ -21,10 +22,20 @@ public class PostDTO {
         this.postId = postId;
     }
 
+    public String getPostTitle() {
+        return postTitle;
+    }
+
+    public void setPostTitle(String postTitle) {
+        this.postTitle = postTitle;
+    }
+
     @Override
     public String toString() {
         return "PostDTO{" +
+                "postId=" + postId +
                 ", postText='" + postText + '\'' +
+                ", postTitle='" + postTitle + '\'' +
                 '}';
     }
 }

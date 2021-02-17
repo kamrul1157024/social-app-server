@@ -26,6 +26,9 @@ public class Post {
     @Column(name = "creation_time",nullable = false)
     private Date creationTime;
 
+    @Column(name = "post_title",nullable = false,columnDefinition = "TEXT")
+    private String postTitle;
+
     @Column(name = "post_text",nullable = false,columnDefinition = "TEXT")
     private String postText;
 
@@ -62,6 +65,14 @@ public class Post {
         this.creationTime = creationTime;
     }
 
+    public String getPostTitle() {
+        return postTitle;
+    }
+
+    public void setPostTitle(String postTitle) {
+        this.postTitle = postTitle;
+    }
+
     public String getPostText() {
         return postText;
     }
@@ -74,10 +85,10 @@ public class Post {
         return user;
     }
 
+
     public void setUser(User user) {
         this.user = user;
     }
-
 
     public List<Comment> getComments() {
         return comments;

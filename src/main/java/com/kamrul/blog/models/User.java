@@ -117,6 +117,7 @@ public class User {
         this.email = email;
     }
 
+    @JsonBackReference
     public String getPassword() {
         return password;
     }

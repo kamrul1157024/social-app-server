@@ -56,8 +56,11 @@ public class PostController {
         );
 
         Post post=new Post();
+
+        post.setPostTitle(postDTO.getPostTitle());
         post.setPostText(postDTO.getPostText());
         post.setUser(user);
+
         postRepository.save(post);
 
         return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
@@ -81,7 +84,9 @@ public class PostController {
         if(!user.equals(post.getUser()))
             throw new UnauthorizedException("User Do no have permission to Update this post");
 
+        post.setPostTitle(postDetails.getPostTitle());
         post.setPostText(postDetails.getPostText());
+
         postRepository.save(post);
 
         return new ResponseEntity<>(post,HttpStatus.OK);

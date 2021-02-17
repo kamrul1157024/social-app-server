@@ -62,6 +62,7 @@ public class UserDTO {
         return dateOfBirth;
     }
 
+
     public void setDateOfBirth(String dateOfBirth) {
         try {
             this.dateOfBirth = new SimpleDateFormat("dd/MM/yyyy").parse(dateOfBirth);
