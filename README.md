@@ -1,3 +1,4 @@
+```
 Blog
 ├───main
 │   ├───java
@@ -74,3 +75,4 @@ Blog
                     │
                     └───repositories
                             UserRepositoryTest.java
+```
