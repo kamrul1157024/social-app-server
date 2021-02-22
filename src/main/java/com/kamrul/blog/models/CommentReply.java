@@ -37,13 +37,18 @@ public class CommentReply {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public CommentReply(String commentReplyString, Long upVotes, Long downVotes) {
-        this.commentReplyText = commentReplyString;
+    private void init()
+    {
         this.creationDate=new Date();
     }
 
+    public CommentReply(String commentReplyString, Long upVotes, Long downVotes) {
+        this.commentReplyText = commentReplyString;
+        init();
+    }
+
     public CommentReply() {
-        this.creationDate=new Date();
+        init();
     }
 
     public Long getCommentReplyId() {
@@ -70,7 +75,7 @@ public class CommentReply {
         this.commentReplyText = commentReplyText;
     }
 
-    @JsonBackReference
+    @JsonBackReference("comment_reply_comment")
     public Comment getComment() {
         return comment;
     }

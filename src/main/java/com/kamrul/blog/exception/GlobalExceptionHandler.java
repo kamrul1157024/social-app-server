@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
                 unauthorizedException.getMessage(),
                 "You are not authorized to do this"
         );
-        return new ResponseEntity<>(errorDetails,HttpStatus.OK);
+        return new ResponseEntity<>(errorDetails,HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     {
         ErrorDetails errorDetails=new ErrorDetails(
           new Date(),
-          e.getMessage(),
+          "Something Wrong with your request",
                 "Please Check The Documentation"
         );
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);

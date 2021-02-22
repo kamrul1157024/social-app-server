@@ -1,6 +1,7 @@
 package com.kamrul.blog.security.filters;
 
 
+import com.kamrul.blog.exception.UnauthorizedException;
 import com.kamrul.blog.security.jwt.JWTUtil;
 import com.kamrul.blog.security.models.AppUserDetails;
 import com.kamrul.blog.security.services.AppUserDetailsService;
@@ -29,13 +30,17 @@ public class JWTRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException
     {
-        final String authrizationHeader=request.getHeader("Authorization");
+        final String authorizationHeader=request.getHeader("Authorization");
         Long userId=null;
         String jwt;
-        if (authrizationHeader!=null && authrizationHeader.startsWith("Bearer "))
+        if (authorizationHeader!=null && authorizationHeader.startsWith("Bearer "))
         {
-            jwt=authrizationHeader.substring(7);
-            userId=jwtUtil.extractUserId(jwt);
+            jwt=authorizationHeader.substring(7);
+            try {
+                userId=jwtUtil.extractUserId(jwt);
+            } catch (UnauthorizedException unauthorizedException) {
+                unauthorizedException.printStackTrace();
+            }
         }
 
 

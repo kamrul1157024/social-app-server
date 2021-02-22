@@ -1,7 +1,9 @@
 package com.kamrul.blog.security.jwt;
 
+import com.kamrul.blog.exception.UnauthorizedException;
 import com.kamrul.blog.security.models.AppUserDetails;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Service;
@@ -17,29 +19,30 @@ public class JWTUtil {
     private final String SECRET_KEY="141D65%$14%2SA939H#20202f2425";
 
 
-    public <T> T extractClaim(String token, Function<Claims,T> claimsResolver)
-    {
+    public <T> T extractClaim(String token, Function<Claims,T> claimsResolver) throws UnauthorizedException {
         final Claims claims=extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token)
-    {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+    private Claims extractAllClaims (String token) throws UnauthorizedException {
+        try {
+            return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        }
+        catch (ExpiredJwtException jwtException)
+        {
+            throw new UnauthorizedException("Unvalid JWT, LogIn again");
+        }
     }
 
-    public Long extractUserId(String token)
-    {
+    public Long extractUserId(String token) throws UnauthorizedException {
         return Long.parseLong(extractClaim(token,Claims::getSubject));
     }
-    public Date extractExpiration(String token)
-    {
+    public Date extractExpiration(String token) throws UnauthorizedException {
         return extractClaim(token,Claims::getExpiration);
     }
 
 
-    private Boolean isTokenExpired(String token)
-    {
+    private Boolean isTokenExpired(String token) throws UnauthorizedException {
         return  extractExpiration(token).before(new Date());
     }
 
@@ -60,8 +63,7 @@ public class JWTUtil {
                 .compact();
     }
 
-    public Boolean validateToken(String token, AppUserDetails userDetails)
-    {
+    public Boolean validateToken(String token, AppUserDetails userDetails) throws UnauthorizedException {
         final Long userId=extractUserId(token);
         return (userId.equals(userDetails.getUserId()) && !isTokenExpired(token));
     }

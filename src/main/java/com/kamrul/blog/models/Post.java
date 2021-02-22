@@ -1,5 +1,7 @@
 package com.kamrul.blog.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
@@ -24,13 +26,16 @@ public class Post {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "creation_time",nullable = false)
-    private Date creationTime;
+    private Date creationDate;
 
     @Column(name = "post_title",nullable = false,columnDefinition = "TEXT")
     private String postTitle;
 
     @Column(name = "post_text",nullable = false,columnDefinition = "TEXT")
     private String postText;
+
+    @Column(name = "is_draft",nullable = false)
+    private boolean isDraft;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id",nullable = false)
@@ -39,14 +44,29 @@ public class Post {
     @OneToMany(mappedBy = "post",fetch = FetchType.EAGER)
     private List<Comment> comments;
 
+    @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
+    private List<UpVote> upVotes;
+
+    @Column(name = "total_up_votes")
+    private Long totalUpVotes;
+
+
+    private void init()
+    {
+        this.creationDate =new Date();
+        this.isDraft=false;
+        totalUpVotes=0L;
+    }
+
 
     public Post(String postText) {
         this.postText = postText;
-        this.creationTime=new Date();
+        init();
     }
 
     public Post() {
-        this.creationTime=new Date();
+        init();
+
     }
 
     public Long getPostId() {
@@ -57,12 +77,12 @@ public class Post {
         this.postId = postId;
     }
 
-    public Date getCreationTime() {
-        return creationTime;
+    public Date getCreationDate() {
+        return creationDate;
     }
 
-    public void setCreationTime(Date creationTime) {
-        this.creationTime = creationTime;
+    public void setCreationDate(Date creationTime) {
+        this.creationDate = creationTime;
     }
 
     public String getPostTitle() {
@@ -96,5 +116,30 @@ public class Post {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    @JsonBackReference("upvoter_list")
+    public List<UpVote> getUpVotes() {
+        return upVotes;
+    }
+
+    public void setUpVotes(List<UpVote> upVotes) {
+        this.upVotes = upVotes;
+    }
+
+    public Long getTotalUpVotes() {
+        return totalUpVotes;
+    }
+
+    public void setTotalUpVotes(Long totalUpVotes) {
+        this.totalUpVotes = totalUpVotes;
+    }
+
+    public boolean isDraft() {
+        return isDraft;
+    }
+
+    public void setDraft(boolean draft) {
+        isDraft = draft;
     }
 }

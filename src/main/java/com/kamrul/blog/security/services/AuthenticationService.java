@@ -8,6 +8,7 @@ import com.kamrul.blog.security.jwt.JWTUtil;
 import com.kamrul.blog.security.models.AppUserDetails;
 import com.kamrul.blog.security.models.AuthenticationRequest;
 import com.kamrul.blog.security.models.AuthenticationResponse;
+import com.kamrul.blog.utils.Converters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationService {
@@ -29,7 +31,6 @@ public class AuthenticationService {
     private JWTUtil jwtUtil;
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     PasswordEncoder passwordEncoder;
 
@@ -59,25 +60,20 @@ public class AuthenticationService {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO)
     {
+
+        System.out.println(userDTO);
+
         User user=new User();
-        user.setUserName(userDTO.getUsername());
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
-        user.setEmail(userDTO.getEmail());
-        user.setDateOfBirth(userDTO.getDateOfBirth());
+        user= Converters.convert(user,userDTO);
 
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+
+        System.out.println(user);
 
         userRepository.save(user);
 
         UserDTO userOutDTO=new UserDTO();
-        userOutDTO.setUsername(user.getUserName());
-        userOutDTO.setEmail(user.getEmail());
-        userOutDTO.setFirstName(user.getFirstName());
-        userOutDTO.setLastName(user.getLastName());
-        userOutDTO.setIsEmailVerified(userOutDTO.getEmailVerified());
-        userOutDTO.setDateOfBirth(user.getDateOfBirth());
-
+        userOutDTO= Converters.convert(userOutDTO,user);
 
         return new ResponseEntity<>(userOutDTO,HttpStatus.ACCEPTED);
     }

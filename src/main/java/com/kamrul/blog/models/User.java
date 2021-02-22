@@ -32,6 +32,9 @@ public class User {
     @Column(name = "user_name", nullable = false)
     private String userName;
 
+    @Column(name = "user_profile_picture")
+    private String profilePicture;
+
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
@@ -51,14 +54,31 @@ public class User {
     @Column(name = "is_email_verified",nullable = false)
     private Boolean isEmailVerified;
 
+    @Column(name = "is_email_visible" ,nullable = false)
+    private Boolean isEmailVisible;
+
+    @Column(name = "city_name",nullable = false)
+    private String city;
+
+    @Column(name = "country_name",nullable = false)
+    private String country;
+
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Post> posts;
-
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<CommentReply> commentReplies;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<UpVote> upVotes;
+
+    private void init()
+    {
+        this.isEmailVisible=false;
+        this.isEmailVerified=false;
+    }
 
     public User(String userName, String firstName, String lastName, String email, String password,Date dateOfBirth) {
         this.userName = userName;
@@ -68,12 +88,13 @@ public class User {
         this.password = password;
         this.dateOfBirth=dateOfBirth;
 
-        this.isEmailVerified=false;
+        init();
 
     }
 
     public User() {
-        this.isEmailVerified=false;
+
+        init();
     }
 
 
@@ -117,7 +138,7 @@ public class User {
         this.email = email;
     }
 
-    @JsonBackReference
+    @JsonBackReference("password")
     public String getPassword() {
         return password;
     }
@@ -126,7 +147,16 @@ public class User {
         this.password = password;
     }
 
-    @JsonBackReference
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    @JsonBackReference("user_posts")
     public List<Post> getPosts() {
         return posts;
     }
@@ -136,7 +166,7 @@ public class User {
         this.posts = posts;
     }
 
-    @JsonBackReference
+    @JsonBackReference("comments")
     public List<Comment> getComments() {
         return comments;
     }
@@ -145,7 +175,7 @@ public class User {
         this.comments = comments;
     }
 
-    @JsonBackReference
+    @JsonBackReference("comment_replies")
     public List<CommentReply> getCommentReplies() {
         return commentReplies;
     }
@@ -170,6 +200,39 @@ public class User {
         isEmailVerified = emailVerified;
     }
 
+    @JsonBackReference("upvotes")
+    public List<UpVote> getUpVotes() {
+        return upVotes;
+    }
+
+    public void setUpVotes(List<UpVote> upVotes) {
+        this.upVotes = upVotes;
+    }
+
+    public Boolean getEmailVisible() {
+        return isEmailVisible;
+    }
+
+    public void setEmailVisible(Boolean emailVisible) {
+        isEmailVisible = emailVisible;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -178,9 +241,7 @@ public class User {
         return Objects.equals(userId, user.userId) && Objects.equals(userName, user.userName) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && Objects.equals(posts, user.posts);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(userId, userName, firstName, lastName, email, password, posts);
-    }
+
 }
+
 

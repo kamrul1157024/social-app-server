@@ -41,13 +41,18 @@ public class Comment {
     @OneToMany(mappedBy = "comment",fetch = FetchType.EAGER)
     private List<CommentReply> commentReplies;
 
-    public Comment(String commentText, Long upVotes, Long downVotes) {
-        this.commentText = commentText;
+    private void init()
+    {
         this.creationDate= new Date();
     }
 
+    public Comment(String commentText, Long upVotes, Long downVotes) {
+        this.commentText = commentText;
+        init();
+    }
+
     public Comment() {
-        this.creationDate=new Date();
+        init();
     }
 
     public Long getCommentId() {
@@ -74,7 +79,7 @@ public class Comment {
         this.commentText = commentText;
     }
 
-    @JsonBackReference
+    @JsonBackReference("comment_post")
     public Post getPost() {
         return post;
     }

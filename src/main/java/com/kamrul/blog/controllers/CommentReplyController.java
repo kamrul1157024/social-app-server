@@ -16,8 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.kamrul.blog.utils.RESPONSE_MSG.*;
+import static com.kamrul.blog.utils.GeneralResponseMessages.*;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/commentReply")
 public class CommentReplyController {
@@ -34,7 +35,7 @@ public class CommentReplyController {
     public ResponseEntity<?> getCommentReplyById(@RequestParam(value = "id") Long commentReplyId)
             throws ResourceNotFoundException
     {
-        CommentReply commentReply= GeneralQuery.getByID(
+        CommentReply commentReply= GeneralQueryRepository.getByID(
                 commentReplyRepository,
                 commentReplyId,
                 COMMENT_NOT_FOUND_MSG
@@ -46,7 +47,7 @@ public class CommentReplyController {
     public ResponseEntity<?> getCommentReplyByCommentId(@PathVariable(value = "commentId") Long commentID)
             throws ResourceNotFoundException
     {
-        Comment comment= GeneralQuery.getByID(
+        Comment comment= GeneralQueryRepository.getByID(
                 commentRepository,
                 commentID,
                 COMMENT_NOT_FOUND_MSG);
@@ -58,13 +59,13 @@ public class CommentReplyController {
     public ResponseEntity<?> createCommentReply(@RequestBody CommentReplyDTO commentReplyDTO)
             throws ResourceNotFoundException, UnauthorizedException {
 
-        User user= GeneralQuery.getByID(
+        User user= GeneralQueryRepository.getByID(
                 userRepository,
-                GeneralQuery.getCurrentlyLoggedInUserId(),
+                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
                 USER_NOT_FOUND_MSG
         );
 
-        Comment comment= GeneralQuery.getByID(
+        Comment comment= GeneralQueryRepository.getByID(
                 commentRepository,
                 commentReplyDTO.getCommentId(),
                 COMMENT_NOT_FOUND_MSG
@@ -85,13 +86,13 @@ public class CommentReplyController {
     public ResponseEntity<?> updateCommentReply(@RequestBody CommentReplyDTO commentReplyDTO)
             throws ResourceNotFoundException, UnauthorizedException
     {
-        User user= GeneralQuery.getByID(
+        User user= GeneralQueryRepository.getByID(
                 userRepository,
-                GeneralQuery.getCurrentlyLoggedInUserId(),
+                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
                 USER_NOT_FOUND_MSG
         );
 
-        CommentReply commentReply=GeneralQuery.getByID(
+        CommentReply commentReply= GeneralQueryRepository.getByID(
                 commentReplyRepository,
                 commentReplyDTO.getCommentReplyId(),
                 COMMENT_NOT_FOUND_MSG
@@ -108,30 +109,17 @@ public class CommentReplyController {
         return new ResponseEntity<>(commentReply,HttpStatus.OK);
     }
 
-    @PutMapping("/upvote")
-    public ResponseEntity<?> upVoteCommentReply(@RequestParam("postId") Long postId ,@RequestParam("userId") Long userId ) throws ResourceNotFoundException {
-
-        return new ResponseEntity<>(null,HttpStatus.OK);
-    }
-
-    @PutMapping("/downvote")
-    public ResponseEntity<?> downVoteCommentReply(@RequestParam("postId") Long postId ,@RequestParam("userId") Long userId) throws ResourceNotFoundException {
-
-        return new ResponseEntity<>(null,HttpStatus.OK);
-    }
-
-
     @DeleteMapping
     public ResponseEntity<?> deleteCommentReply(@RequestParam(value = "id") Long commentReplyId)
             throws ResourceNotFoundException, UnauthorizedException
     {
-        User user= GeneralQuery.getByID(
+        User user= GeneralQueryRepository.getByID(
                 userRepository,
-                GeneralQuery.getCurrentlyLoggedInUserId(),
+                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
                 USER_NOT_FOUND_MSG
         );
 
-        CommentReply commentReply=GeneralQuery.getByID(
+        CommentReply commentReply= GeneralQueryRepository.getByID(
                 commentReplyRepository,
                 commentReplyId,
                 COMMENT_NOT_FOUND_MSG

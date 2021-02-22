@@ -8,7 +8,7 @@ import com.kamrul.blog.models.Comment;
 import com.kamrul.blog.models.Post;
 import com.kamrul.blog.models.User;
 import com.kamrul.blog.repositories.CommentRepository;
-import com.kamrul.blog.repositories.GeneralQuery;
+import com.kamrul.blog.repositories.GeneralQueryRepository;
 import com.kamrul.blog.repositories.PostRepository;
 import com.kamrul.blog.repositories.UserRepository;
 import com.kamrul.blog.utils.Message;
@@ -20,9 +20,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.kamrul.blog.utils.RESPONSE_MSG.*;
+import static com.kamrul.blog.utils.GeneralResponseMessages.*;
 
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/comment")
 public class CommentController {
@@ -36,7 +37,7 @@ public class CommentController {
     @GetMapping
     public ResponseEntity<?> getCommentById(@RequestParam(value = "id") Long commentId)
             throws ResourceNotFoundException {
-        Comment comment= GeneralQuery.getByID(
+        Comment comment= GeneralQueryRepository.getByID(
                 commentRepository,
                 commentId,
                 COMMENT_NOT_FOUND_MSG
@@ -47,7 +48,7 @@ public class CommentController {
     @GetMapping("/post/{postId}")
     public ResponseEntity<?> getCommentByPostId(@PathVariable(value = "postId") Long postId)
             throws ResourceNotFoundException {
-        Post post= GeneralQuery.getByID(
+        Post post= GeneralQueryRepository.getByID(
                 postRepository,
                 postId,
                 POST_NOT_FOUND_MSG
@@ -61,13 +62,13 @@ public class CommentController {
     public ResponseEntity<?> createComment(@RequestBody CommentDTO commentDTO)
             throws ResourceNotFoundException, UnauthorizedException {
 
-        User user= GeneralQuery.getByID(
+        User user= GeneralQueryRepository.getByID(
                 userRepository,
-                GeneralQuery.getCurrentlyLoggedInUserId(),
+                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
                 USER_NOT_FOUND_MSG
         );
 
-        Post post= GeneralQuery.getByID(
+        Post post= GeneralQueryRepository.getByID(
                 postRepository,
                 commentDTO.getPostId(),
                 POST_NOT_FOUND_MSG
@@ -88,13 +89,13 @@ public class CommentController {
     public ResponseEntity<?> updateComment(@RequestBody CommentDTO commentDTO)
             throws ResourceNotFoundException, UnauthorizedException {
 
-        User user= GeneralQuery.getByID(
+        User user= GeneralQueryRepository.getByID(
                 userRepository,
-                GeneralQuery.getCurrentlyLoggedInUserId(),
+                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
                 USER_NOT_FOUND_MSG
         );
 
-        Comment comment=GeneralQuery.getByID(
+        Comment comment= GeneralQueryRepository.getByID(
                 commentRepository,
                 commentDTO.getCommentId(),
                 COMMENT_NOT_FOUND_MSG
@@ -110,40 +111,18 @@ public class CommentController {
         return new ResponseEntity<>(comment,HttpStatus.OK);
     }
 
-    @PutMapping("/upvote")
-    public ResponseEntity<?> upVoteComment(@RequestParam("postId") Long postId ,@RequestParam("userId") Long userId ) throws ResourceNotFoundException {
-        Post post= GeneralQuery.getByID(postRepository,postId,"Post does not Exist");
-        User user= GeneralQuery.getByID(userRepository,userId,"User does not Exist");
-
-        //do nothing
-
-        postRepository.save(post);
-        return new ResponseEntity<>(post,HttpStatus.OK);
-    }
-
-    @PutMapping("/downvote")
-    public ResponseEntity<?> downVoteComment(@RequestParam("postId") Long postId ,@RequestParam("userId") Long userId) throws ResourceNotFoundException {
-        Post post= GeneralQuery.getByID(postRepository,postId,"Post does not Exist");
-        User user= GeneralQuery.getByID(userRepository,userId,"User does not Exist");
-
-        //do nothing
-
-        postRepository.save(post);
-        return new ResponseEntity<>(post,HttpStatus.OK);
-    }
-
 
     @DeleteMapping
     public ResponseEntity<?> deleteComment(@RequestParam(value = "id") Long commentId)
             throws ResourceNotFoundException, UnauthorizedException {
 
-        User user= GeneralQuery.getByID(
+        User user= GeneralQueryRepository.getByID(
                 userRepository,
-                GeneralQuery.getCurrentlyLoggedInUserId(),
+                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
                 USER_NOT_FOUND_MSG
         );
 
-        Comment comment=GeneralQuery.getByID(
+        Comment comment= GeneralQueryRepository.getByID(
                 commentRepository,
                 commentId,
                 COMMENT_NOT_FOUND_MSG
