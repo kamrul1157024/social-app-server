@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-import static com.kamrul.blog.utils.GeneralResponseMessages.*;
+import static com.kamrul.blog.utils.GeneralResponseMSG.*;
 
 @CrossOrigin
 @RestController
@@ -94,7 +94,6 @@ public class PostController {
         posts.forEach(post -> {
             PostDTO postDTO=new PostDTO();
             postDTO=Converters.convert(postDTO,post);
-            postDTO.setComments(null);
             postDTOs.add(postDTO);
         });
 
@@ -132,12 +131,8 @@ public class PostController {
         );
         postDTO.setUser(user);
 
-        System.out.println(postDTO);
-
         Post post=new Post();
         post=Converters.convert(post,postDTO);
-
-        System.out.println(post);
 
         postRepository.save(post);
 

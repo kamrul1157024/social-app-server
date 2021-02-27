@@ -18,6 +18,7 @@ public class UserDTO {
     private Boolean isEmailVisible;
     private String city;
     private String country;
+    private String gender;
 
     public UserDTO(){}
 
@@ -120,4 +121,11 @@ public class UserDTO {
         this.country = country;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
 }

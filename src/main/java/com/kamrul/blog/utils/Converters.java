@@ -21,7 +21,7 @@ public class Converters {
         userDTO.setCountry(user.getCountry());
         userDTO.setIsEmailVerified(userDTO.getEmailVerified());
         userDTO.setEmailVisible(user.getEmailVisible());
-
+        userDTO.setGender(user.getGender());
         return userDTO;
     }
 
@@ -58,7 +58,8 @@ public class Converters {
 
         if(userDTO.getProfilePicture()!=null)
             user.setProfilePicture(userDTO.getProfilePicture());
-
+        if(userDTO.getGender()!=null)
+            user.setGender(userDTO.getGender());
         return user;
     }
 
@@ -72,7 +73,7 @@ public class Converters {
         postDTO.setCreationDate(post.getCreationDate());
         postDTO.setDraft(post.isDraft());
         postDTO.setTotalUpVotes(post.getTotalUpVotes());
-
+        postDTO.setTags(post.getTags());
         return postDTO;
     }
 
@@ -86,8 +87,8 @@ public class Converters {
             post.setPostText(postDTO.getPostText());
         if(postDTO.getDraft()!=null)
             post.setDraft(postDTO.getDraft());
-
-
+        if(postDTO.getTags()!=null)
+            post.setTags(postDTO.getTags());
         return post;
     }
 

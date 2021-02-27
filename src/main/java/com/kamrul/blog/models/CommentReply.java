@@ -29,11 +29,11 @@ public class CommentReply {
     @Column(name = "comment_reply_text",nullable = false,columnDefinition = "TEXT")
     private String commentReplyText;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 

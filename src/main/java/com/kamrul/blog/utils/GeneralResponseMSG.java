@@ -1,6 +1,6 @@
 package com.kamrul.blog.utils;
 
-public class GeneralResponseMessages {
+public class GeneralResponseMSG {
 
     public static final String USER_NOT_FOUND_MSG="User does not exist";
     public static final String POST_NOT_FOUND_MSG="Post Does not exist";

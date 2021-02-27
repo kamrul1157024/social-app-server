@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-import static com.kamrul.blog.utils.GeneralResponseMessages.USER_NOT_FOUND_MSG;
+import static com.kamrul.blog.utils.GeneralResponseMSG.USER_NOT_FOUND_MSG;
 
 @CrossOrigin
 @RestController

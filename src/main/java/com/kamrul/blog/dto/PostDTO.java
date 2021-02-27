@@ -1,6 +1,7 @@
 package com.kamrul.blog.dto;
 
 import com.kamrul.blog.models.Comment;
+import com.kamrul.blog.models.Tag;
 import com.kamrul.blog.models.User;
 
 import java.util.Date;
@@ -17,7 +18,7 @@ public class PostDTO {
     private User user;
     private Boolean isPostUpVotedByCurrentUser;
     private Long totalUpVotes;
-
+    private List<Tag> tags;
     public  PostDTO()
     {
         isPostUpVotedByCurrentUser=false;
@@ -93,5 +94,13 @@ public class PostDTO {
 
     public void setTotalUpVotes(Long totalUpVotes) {
         this.totalUpVotes = totalUpVotes;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 }

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.kamrul.blog.utils.GeneralResponseMessages.*;
+import static com.kamrul.blog.utils.GeneralResponseMSG.*;
 
 
 @CrossOrigin

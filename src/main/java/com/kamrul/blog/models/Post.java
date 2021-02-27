@@ -41,7 +41,7 @@ public class Post {
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "post",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
@@ -50,6 +50,12 @@ public class Post {
     @Column(name = "total_up_votes")
     private Long totalUpVotes;
 
+    @ManyToMany(cascade =CascadeType.MERGE,fetch = FetchType.EAGER)
+    @JoinTable(name = "post_tags",
+            joinColumns = {@JoinColumn(name = "post_id")},
+            inverseJoinColumns =  {@JoinColumn(name = "tag_id")}
+    )
+    private List<Tag> tags;
 
     private void init()
     {
@@ -141,5 +147,14 @@ public class Post {
 
     public void setDraft(boolean draft) {
         isDraft = draft;
+    }
+
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 }
