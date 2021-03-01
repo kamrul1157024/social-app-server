@@ -69,7 +69,6 @@ public class Converters {
         postDTO.setPostId(post.getPostId());
         postDTO.setPostTitle(post.getPostTitle());
         postDTO.setPostText(post.getPostText());
-        postDTO.setComments(post.getComments());
         postDTO.setCreationDate(post.getCreationDate());
         postDTO.setDraft(post.isDraft());
         postDTO.setTotalUpVotes(post.getTotalUpVotes());

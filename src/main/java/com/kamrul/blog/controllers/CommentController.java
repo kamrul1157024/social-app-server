@@ -46,15 +46,8 @@ public class CommentController {
     }
 
     @GetMapping("/post/{postId}")
-    public ResponseEntity<?> getCommentByPostId(@PathVariable(value = "postId") Long postId)
-            throws ResourceNotFoundException {
-        Post post= GeneralQueryRepository.getByID(
-                postRepository,
-                postId,
-                POST_NOT_FOUND_MSG
-        );
-        List<Comment> comments=post.getComments();
-
+    public ResponseEntity<?> getCommentByPostId(@PathVariable(value = "postId") Long postId) {
+        List<Comment> comments=commentRepository.getCommentsByPostID(postId);
         return new ResponseEntity<>(comments,HttpStatus.OK);
     }
 

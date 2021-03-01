@@ -1,6 +1,7 @@
 package com.kamrul.blog.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -38,7 +39,7 @@ public class Comment {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "comment",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "comment",fetch = FetchType.LAZY)
     private List<CommentReply> commentReplies;
 
     private void init()
@@ -49,6 +50,14 @@ public class Comment {
     public Comment(String commentText, Long upVotes, Long downVotes) {
         this.commentText = commentText;
         init();
+    }
+
+    public  Comment(Long commentId,String commentText,Date creationDate,User user)
+    {
+        this.commentId=commentId;
+        this.commentText=commentText;
+        this.creationDate=creationDate;
+        this.user=user;
     }
 
     public Comment() {

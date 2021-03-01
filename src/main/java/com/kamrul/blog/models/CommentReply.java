@@ -29,7 +29,7 @@ public class CommentReply {
     @Column(name = "comment_reply_text",nullable = false,columnDefinition = "TEXT")
     private String commentReplyText;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
@@ -42,10 +42,19 @@ public class CommentReply {
         this.creationDate=new Date();
     }
 
-    public CommentReply(String commentReplyString, Long upVotes, Long downVotes) {
+    public CommentReply(String commentReplyString) {
         this.commentReplyText = commentReplyString;
         init();
     }
+
+    public CommentReply(Long commentReplyId,String commentReplyText,Date creationDate,User user)
+    {
+        this.commentReplyId=commentReplyId;
+        this.commentReplyText=commentReplyText;
+        this.creationDate=creationDate;
+        this.user=user;
+    }
+
 
     public CommentReply() {
         init();

@@ -43,15 +43,10 @@ public class CommentReplyController {
         return new ResponseEntity<>(commentReply, HttpStatus.OK);
     }
 
-    @GetMapping("/post/{commentID}")
+    @GetMapping("/comment/{commentId}")
     public ResponseEntity<?> getCommentReplyByCommentId(@PathVariable(value = "commentId") Long commentID)
-            throws ResourceNotFoundException
     {
-        Comment comment= GeneralQueryRepository.getByID(
-                commentRepository,
-                commentID,
-                COMMENT_NOT_FOUND_MSG);
-        List<CommentReply> commentReplies=comment.getCommentReplies();
+        List<CommentReply> commentReplies=commentReplyRepository.getCommentRepliesByCommentId(commentID);
         return new ResponseEntity<>(commentReplies,HttpStatus.OK);
     }
 
