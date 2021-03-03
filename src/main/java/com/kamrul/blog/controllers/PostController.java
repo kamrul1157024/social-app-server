@@ -1,14 +1,16 @@
 package com.kamrul.blog.controllers;
 
+import com.kamrul.blog.dto.MedalDTO;
 import com.kamrul.blog.dto.PostDTO;
 import com.kamrul.blog.exception.ResourceNotFoundException;
 import com.kamrul.blog.exception.UnauthorizedException;
+import com.kamrul.blog.models.MedalType;
 import com.kamrul.blog.models.Post;
-import com.kamrul.blog.models.UpVote;
+import com.kamrul.blog.models.Medal;
 import com.kamrul.blog.models.User;
 import com.kamrul.blog.repositories.GeneralQueryRepository;
 import com.kamrul.blog.repositories.PostRepository;
-import com.kamrul.blog.repositories.UpVoteRepository;
+import com.kamrul.blog.repositories.MedalRepository;
 import com.kamrul.blog.repositories.UserRepository;
 import com.kamrul.blog.utils.Converters;
 import com.kamrul.blog.utils.Message;
@@ -32,37 +34,33 @@ public class PostController {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UpVoteRepository upVoteRepository;
+    private MedalRepository medalRepository;
 
     @GetMapping
     public ResponseEntity<?> getPostById(@RequestParam(value = "id") Long postId)
             throws ResourceNotFoundException {
+
         Post post= GeneralQueryRepository.getByID(
                 postRepository,
                 postId,
                 POST_NOT_FOUND_MSG
                 );
 
-        Boolean isUserLoggedIn=false;
-
-        Boolean isUserUpVotedCurrentPost=false;
 
         PostDTO postDTO=new PostDTO();
-        postDTO= Converters.convert(postDTO,post);
+        postDTO= Converters.convert(post,postDTO);
 
         try {
-            User user= GeneralQueryRepository.getByID(
+            User loggedInUser= GeneralQueryRepository.getByID(
                     userRepository,
                     GeneralQueryRepository.getCurrentlyLoggedInUserId(),
                     USER_NOT_FOUND_MSG
             );
-            isUserLoggedIn=true;
 
-            Optional<UpVote> upVote=upVoteRepository.
-                    findUpVoteByUserIdAndPostID(user.getUserId(),post.getPostId());
+            Optional<MedalDTO> medal= medalRepository.findMedalByUserIdAndPostID(loggedInUser.getUserId(),post.getPostId());
+            MedalType medalGivenByLoggedInUser= medal.isPresent()? medal.get().getMedalType() : MedalType.NO_MEDAL;
+            postDTO.setMedalTypeProvidedByLoggedInUser(medalGivenByLoggedInUser);
 
-            if(upVote.isPresent()) isUserUpVotedCurrentPost=true;
-            postDTO.setPostUpVotedByCurrentUser(isUserLoggedIn && isUserUpVotedCurrentPost);
         } catch (UnauthorizedException unauthorizedException) {
             System.out.println("Anonymous User");
         }
@@ -70,54 +68,36 @@ public class PostController {
         return new ResponseEntity<>(postDTO,HttpStatus.OK);
     }
 
-    @GetMapping("upvoters")
-    public ResponseEntity<?> getUpVotersOfThePost(@RequestParam(value = "id")Long postId) throws ResourceNotFoundException {
+    @GetMapping("medalGivers")
+    public ResponseEntity<?> getMedalGiversOfThePost(@RequestParam(value = "id")Long postId) throws ResourceNotFoundException {
         Post post= GeneralQueryRepository.getByID(
                 postRepository,
                 postId,
                 POST_NOT_FOUND_MSG
         );
-
-
-        return new ResponseEntity<>(post.getUpVotes(),HttpStatus.OK);
+        return new ResponseEntity<>(post.getMedals(),HttpStatus.OK);
     }
 
     @GetMapping("/page/{pageId}")
     public ResponseEntity<?> getPostByPage(@PathVariable(value = "pageId") Integer pageId)
     {
         final Integer pageSize=10;
-
-        Page<Post> posts=postRepository.getTopPost(PageRequest.of(pageId-1,pageSize));
-
+        Page<Post> postDTOPage=postRepository.getTopPost(PageRequest.of(pageId-1,pageSize));
         List<PostDTO> postDTOs=new ArrayList<>();
-
-        posts.forEach(post -> {
-            PostDTO postDTO=new PostDTO();
-            postDTO=Converters.convert(postDTO,post);
-            postDTOs.add(postDTO);
-        });
-
-
+        postDTOPage.forEach(post -> postDTOs.add(Converters.convert(post,new PostDTO())));
         try {
-
             Long loggedInUserId=GeneralQueryRepository.getCurrentlyLoggedInUserId();
-            List<Long> upVotedPostIds=postRepository
-                    .getPostWhichIsUpVotedByCurrentlyLoggedInUser(loggedInUserId);
+            List<MedalDTO> medalGivenPostIds=postRepository
+                    .getPostForCurrentlyLoggedInUserOnWhichUserGivenMedal(loggedInUserId);
 
-            HashMap<Long,Boolean> isUpVoted=new HashMap<>();
-            upVotedPostIds.forEach((postId)->isUpVoted.put(postId,true));
-
-            postDTOs.forEach(postDTO -> postDTO.setPostUpVotedByCurrentUser(
-                    isUpVoted.getOrDefault(postDTO.getPostId(),false)
-                    )
-            );
+            //<PostID, MedalType>
+            HashMap<Long,MedalType> medalTypeGivenByUser=new HashMap<>();
+            medalGivenPostIds.forEach(medalDTO->medalTypeGivenByUser.put(medalDTO.getPostId(), medalDTO.getMedalType()));
+            postDTOs.forEach(postDTO->postDTO.setMedalTypeProvidedByLoggedInUser(medalTypeGivenByUser.getOrDefault(postDTO.getPostId(),MedalType.NO_MEDAL)));
 
         } catch (UnauthorizedException unauthorizedException) {
-
-            //Serving to Unauthorized User
-
+            System.out.println("UnAuthorised User");
         }
-
         return new ResponseEntity<>(postDTOs,HttpStatus.OK);
     }
 
@@ -130,12 +110,9 @@ public class PostController {
                 USER_NOT_FOUND_MSG
         );
         postDTO.setUser(user);
-
         Post post=new Post();
-        post=Converters.convert(post,postDTO);
-
+        post=Converters.convert(postDTO,post);
         postRepository.save(post);
-
         return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
     }
 
@@ -147,17 +124,15 @@ public class PostController {
                 GeneralQueryRepository.getCurrentlyLoggedInUserId(),
                 USER_NOT_FOUND_MSG
         );
-
         Post post= GeneralQueryRepository.getByID(
                 postRepository,
                 postDetails.getPostId(),
                 POST_NOT_FOUND_MSG
         );
-
         if(!user.equals(post.getUser()))
             throw new UnauthorizedException("User Do no have permission to Update this post");
 
-        post=Converters.convert(post,postDetails);
+        post=Converters.convert(postDetails,post);
 
         postRepository.save(post);
 

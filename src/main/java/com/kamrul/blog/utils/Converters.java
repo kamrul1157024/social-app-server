@@ -9,7 +9,7 @@ import com.kamrul.blog.models.User;
 public class Converters {
 
 
-    public static UserDTO convert(UserDTO userDTO, User user)
+    public static UserDTO convert(User user,UserDTO userDTO)
     {
         userDTO.setUserName(user.getUserName());
         userDTO.setFirstName(user.getFirstName());
@@ -19,14 +19,15 @@ public class Converters {
         userDTO.setProfilePicture(user.getProfilePicture());
         userDTO.setCity(user.getCity());
         userDTO.setCountry(user.getCountry());
-        userDTO.setIsEmailVerified(userDTO.getEmailVerified());
+        userDTO.setEmailVerified(user.getEmailVerified());
         userDTO.setEmailVisible(user.getEmailVisible());
         userDTO.setGender(user.getGender());
+        userDTO.setTotalBahUserGained(user.getTotalBahUserGained());
         return userDTO;
     }
 
 
-    public static User convert(User user, UserDTO userDTO)
+    public static User convert( UserDTO userDTO,User user)
     {
 
         if(userDTO.getUserName()!=null)
@@ -63,7 +64,7 @@ public class Converters {
         return user;
     }
 
-    public static PostDTO convert(PostDTO postDTO,Post post)
+    public static PostDTO convert(Post post,PostDTO postDTO)
     {
         postDTO.setUser(post.getUser());
         postDTO.setPostId(post.getPostId());
@@ -71,12 +72,14 @@ public class Converters {
         postDTO.setPostText(post.getPostText());
         postDTO.setCreationDate(post.getCreationDate());
         postDTO.setDraft(post.isDraft());
-        postDTO.setTotalUpVotes(post.getTotalUpVotes());
+        postDTO.setTotalBronze(post.getTotalBronze());
+        postDTO.setTotalSilver(post.getTotalSilver());
+        postDTO.setTotalGold(post.getTotalGold());
         postDTO.setTags(post.getTags());
         return postDTO;
     }
 
-    public static Post convert(Post post,PostDTO postDTO)
+    public static Post convert(PostDTO postDTO,Post post)
     {
         if(postDTO.getUser()!=null)
             post.setUser(postDTO.getUser());

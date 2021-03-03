@@ -19,6 +19,7 @@ public class UserDTO {
     private String city;
     private String country;
     private String gender;
+    private Long totalBahUserGained;
 
     public UserDTO(){}
 
@@ -80,15 +81,6 @@ public class UserDTO {
         this.dateOfBirth=dateOfBirth;
     }
 
-
-    public Boolean getEmailVerified() {
-        return isEmailVerified;
-    }
-
-    public void setIsEmailVerified(Boolean isEmailVerified) {
-        this.isEmailVerified = isEmailVerified;
-    }
-
     public String getProfilePicture() {
         return profilePicture;
     }
@@ -127,5 +119,21 @@ public class UserDTO {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public Boolean getEmailVerified() {
+        return isEmailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+        isEmailVerified = emailVerified;
+    }
+
+    public Long getTotalBahUserGained() {
+        return totalBahUserGained;
+    }
+
+    public void setTotalBahUserGained(Long totalBahUserGained) {
+        this.totalBahUserGained = totalBahUserGained;
     }
 }

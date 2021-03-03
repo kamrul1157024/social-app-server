@@ -45,12 +45,17 @@ public class Post {
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
-    private List<UpVote> upVotes;
+    private List<Medal> medals;
 
-    @Column(name = "total_up_votes")
-    private Long totalUpVotes;
+    @Column(name = "total_bronze")
+    private Long totalBronze;
+    @Column(name = "total_silver")
+    private Long totalSilver;
+    @Column(name = "total_gold")
+    private Long totalGold;
 
-    @ManyToMany(cascade =CascadeType.MERGE,fetch = FetchType.EAGER)
+
+    @ManyToMany(cascade =CascadeType.REFRESH,fetch = FetchType.EAGER)
     @JoinTable(name = "post_tags",
             joinColumns = {@JoinColumn(name = "post_id")},
             inverseJoinColumns =  {@JoinColumn(name = "tag_id")}
@@ -61,7 +66,9 @@ public class Post {
     {
         this.creationDate =new Date();
         this.isDraft=false;
-        totalUpVotes=0L;
+        this.totalBronze=0L;
+        this.totalSilver=0L;
+        this.totalGold=0L;
     }
 
 
@@ -72,7 +79,21 @@ public class Post {
 
     public Post() {
         init();
+    }
 
+
+    public void addMedalCount(MedalType medalType)
+    {
+        if(medalType==MedalType.BRONZE) this.totalBronze++;
+        if(medalType==MedalType.SILVER) this.totalSilver++;
+        if(medalType==MedalType.GOLD) this.totalGold++;
+    }
+
+    public void removePreviousMedalCount(MedalType previousMedalType)
+    {
+        if(previousMedalType==MedalType.BRONZE) this.totalBronze--;
+        if(previousMedalType==MedalType.SILVER) this.totalSilver--;
+        if(previousMedalType==MedalType.GOLD) this.totalGold--;
     }
 
     public Long getPostId() {
@@ -85,10 +106,6 @@ public class Post {
 
     public Date getCreationDate() {
         return creationDate;
-    }
-
-    public void setCreationDate(Date creationTime) {
-        this.creationDate = creationTime;
     }
 
     public String getPostTitle() {
@@ -111,7 +128,6 @@ public class Post {
         return user;
     }
 
-
     public void setUser(User user) {
         this.user = user;
     }
@@ -124,21 +140,37 @@ public class Post {
         this.comments = comments;
     }
 
-    @JsonBackReference("upvoter_list")
-    public List<UpVote> getUpVotes() {
-        return upVotes;
+    @JsonBackReference
+    public List<Medal> getMedals() {
+        return medals;
     }
 
-    public void setUpVotes(List<UpVote> upVotes) {
-        this.upVotes = upVotes;
+    public void setMedals(List<Medal> medals) {
+        this.medals = medals;
     }
 
-    public Long getTotalUpVotes() {
-        return totalUpVotes;
+    public Long getTotalBronze() {
+        return totalBronze;
     }
 
-    public void setTotalUpVotes(Long totalUpVotes) {
-        this.totalUpVotes = totalUpVotes;
+    public void setTotalBronze(Long totalBronze) {
+        this.totalBronze = totalBronze;
+    }
+
+    public Long getTotalSilver() {
+        return totalSilver;
+    }
+
+    public void setTotalSilver(Long totalSiver) {
+        this.totalSilver = totalSiver;
+    }
+
+    public Long getTotalGold() {
+        return totalGold;
+    }
+
+    public void setTotalGold(Long totalGold) {
+        this.totalGold = totalGold;
     }
 
     public boolean isDraft() {
@@ -148,7 +180,6 @@ public class Post {
     public void setDraft(boolean draft) {
         isDraft = draft;
     }
-
 
     public List<Tag> getTags() {
         return tags;

@@ -1,9 +1,12 @@
 package com.kamrul.blog.dto;
 
 import com.kamrul.blog.models.Comment;
+import com.kamrul.blog.models.MedalType;
 import com.kamrul.blog.models.Tag;
 import com.kamrul.blog.models.User;
 
+import javax.persistence.Column;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -14,15 +17,38 @@ public class PostDTO {
     private String postTitle;
     private Boolean isDraft;
     private Date creationDate;
-    private List<Comment> comments;
     private User user;
-    private Boolean isPostUpVotedByCurrentUser;
-    private Long totalUpVotes;
+    private Long totalBronze;
+    private Long totalSilver;
+    private Long totalGold;
     private List<Tag> tags;
-    public  PostDTO()
-    {
-        isPostUpVotedByCurrentUser=false;
+    private MedalType medalTypeProvidedByLoggedInUser;
+
+    public PostDTO(
+            Long postId,
+            String postText,
+            String postTitle,
+            Boolean isDraft,
+            Date creationDate,
+            User user,
+            Long totalBronze,
+            Long totalSilver,
+            Long totalGold,
+            Collection<Tag> tags
+    ) {
+        this.postId = postId;
+        this.postText = postText;
+        this.postTitle = postTitle;
+        this.isDraft = isDraft;
+        this.creationDate = creationDate;
+        this.user = user;
+        this.totalBronze = totalBronze;
+        this.totalSilver = totalSilver;
+        this.totalGold = totalGold;
+        this.tags = (List<Tag>) tags;
     }
+
+    public PostDTO(){};
 
     public String getPostText() {
         return postText;
@@ -48,24 +74,8 @@ public class PostDTO {
         this.postTitle = postTitle;
     }
 
-    public Boolean getPostUpVotedByCurrentUser() {
-        return isPostUpVotedByCurrentUser;
-    }
-
-    public void setPostUpVotedByCurrentUser(Boolean postUpVotedByCurrentUser) {
-        isPostUpVotedByCurrentUser = postUpVotedByCurrentUser;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
     }
 
     public User getUser() {
@@ -88,19 +98,43 @@ public class PostDTO {
         this.creationDate = creationDate;
     }
 
-    public Long getTotalUpVotes() {
-        return totalUpVotes;
-    }
-
-    public void setTotalUpVotes(Long totalUpVotes) {
-        this.totalUpVotes = totalUpVotes;
-    }
-
     public List<Tag> getTags() {
         return tags;
     }
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public Long getTotalBronze() {
+        return totalBronze;
+    }
+
+    public void setTotalBronze(Long totalBronze) {
+        this.totalBronze = totalBronze;
+    }
+
+    public Long getTotalSilver() {
+        return totalSilver;
+    }
+
+    public void setTotalSilver(Long totalSilver) {
+        this.totalSilver = totalSilver;
+    }
+
+    public Long getTotalGold() {
+        return totalGold;
+    }
+
+    public void setTotalGold(Long totalGold) {
+        this.totalGold = totalGold;
+    }
+
+    public MedalType getMedalTypeProvidedByLoggedInUser() {
+        return medalTypeProvidedByLoggedInUser;
+    }
+
+    public void setMedalTypeProvidedByLoggedInUser(MedalType medalTypeProvidedByLoggedInUser) {
+        this.medalTypeProvidedByLoggedInUser = medalTypeProvidedByLoggedInUser;
     }
 }

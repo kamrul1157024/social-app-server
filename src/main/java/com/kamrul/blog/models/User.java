@@ -68,6 +68,9 @@ public class User {
     @Column(name = "gender",nullable = false)
     private String gender;
 
+    @Column(name = "bah_gained_by_user")
+    private Long totalBahUserGained;
+
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Post> posts;
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
@@ -77,12 +80,30 @@ public class User {
     private List<CommentReply> commentReplies;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<UpVote> upVotes;
+    private List<Medal> medals;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "follower",
+            joinColumns = @JoinColumn(name = "follower_id"),
+            inverseJoinColumns = @JoinColumn(name = "followee_id")
+    )
+    private List<User> follower;
+    @ManyToMany
+    @JoinTable(
+            name = "follower",
+            joinColumns = @JoinColumn(name = "followee_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private List<User> followee;
+
 
     private void init()
     {
         this.isEmailVisible=false;
         this.isEmailVerified=false;
+        totalBahUserGained=0L;
     }
 
     public User(String userName, String firstName, String lastName, String email, String password,Date dateOfBirth) {
@@ -205,15 +226,6 @@ public class User {
         isEmailVerified = emailVerified;
     }
 
-    @JsonBackReference("upvotes")
-    public List<UpVote> getUpVotes() {
-        return upVotes;
-    }
-
-    public void setUpVotes(List<UpVote> upVotes) {
-        this.upVotes = upVotes;
-    }
-
     public Boolean getEmailVisible() {
         return isEmailVisible;
     }
@@ -236,6 +248,42 @@ public class User {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public Long getTotalBahUserGained() {
+        return totalBahUserGained;
+    }
+
+    public void setTotalBahUserGained(Long totalBahUserGained) {
+        this.totalBahUserGained = totalBahUserGained;
+    }
+
+
+    @JsonBackReference
+    public List<User> getFollower() {
+        return follower;
+    }
+
+    public void setFollower(List<User> follower) {
+        this.follower = follower;
+    }
+
+    @JsonBackReference
+    public List<User> getFollowee() {
+        return followee;
+    }
+
+    public void setFollowee(List<User> followee) {
+        this.followee = followee;
+    }
+
+    @JsonBackReference
+    public List<Medal> getMedals() {
+        return medals;
+    }
+
+    public void setMedals(List<Medal> medals) {
+        this.medals = medals;
     }
 
     @Override

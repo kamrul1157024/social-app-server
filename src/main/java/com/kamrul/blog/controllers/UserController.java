@@ -1,9 +1,11 @@
 package com.kamrul.blog.controllers;
 
+import com.kamrul.blog.dto.MedalDTO;
 import com.kamrul.blog.dto.PostDTO;
 import com.kamrul.blog.dto.UserDTO;
 import com.kamrul.blog.exception.ResourceNotFoundException;
 import com.kamrul.blog.exception.UnauthorizedException;
+import com.kamrul.blog.models.MedalType;
 import com.kamrul.blog.models.Post;
 import com.kamrul.blog.models.User;
 import com.kamrul.blog.repositories.GeneralQueryRepository;
@@ -12,12 +14,12 @@ import com.kamrul.blog.repositories.UserRepository;
 import com.kamrul.blog.utils.Converters;
 import com.kamrul.blog.utils.Message;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.*;
-
 import static com.kamrul.blog.utils.GeneralResponseMSG.USER_NOT_FOUND_MSG;
 
 @CrossOrigin
@@ -36,7 +38,7 @@ public class UserController {
         User user= GeneralQueryRepository.getByID(userRepository,userId,USER_NOT_FOUND_MSG);
 
         UserDTO userDTO=new UserDTO();
-        userDTO=Converters.convert(userDTO,user);
+        userDTO=Converters.convert(user,userDTO);
 
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
@@ -51,58 +53,49 @@ public class UserController {
                 USER_NOT_FOUND_MSG);
 
         UserDTO userDTO=new UserDTO();
-        userDTO= Converters.convert(userDTO,user);
+        userDTO= Converters.convert(user,userDTO);
 
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
 
     @GetMapping("/posts")
-    public ResponseEntity<?> getUserPost(@RequestParam(value = "id") Long userId)
-            throws ResourceNotFoundException {
+    public ResponseEntity<?> getUserPost(
+            @RequestParam(value = "id") Long userId,
+            @RequestParam("pageNo") Integer pageNo
+    ) {
 
-        User user= GeneralQueryRepository.getByID(userRepository,userId,USER_NOT_FOUND_MSG);
-
-        List<Post> posts=user.getPosts();
-
+        final Integer pageSize=10;
+        Page<Post> postDTOPage=postRepository.getPostByUserId(userId, PageRequest.of(pageNo-1,pageSize));
         List<PostDTO> postDTOS = new ArrayList<>();
-
-        posts.forEach((post)-> {
-            PostDTO postDTO=new PostDTO();
-            postDTO=Converters.convert(postDTO,post);
-            postDTOS.add(postDTO);
-        });
-
-
+        postDTOPage.forEach(post -> postDTOS.add(Converters.convert(post,new PostDTO())));
         try {
             Long currentlyLoggedInUserId
                     =GeneralQueryRepository.getCurrentlyLoggedInUserId();
 
-            List<Long> upVotedPost=postRepository
-                    .getPostIdForUserIdWhichIsUpVotedByCurrentlyLoggedInUser(
+            List<MedalDTO> medalGivenPostOfCurrentlyLoggedInUser= postRepository
+                    .getPostIdForUserIdOnWhichCurrentlyLoggedInUserGivenMedal(
                             currentlyLoggedInUserId,
                             userId
                     );
 
-
-            HashMap<Long,Boolean> isUpVoted=new HashMap<>();
-            upVotedPost.forEach((postId)-> isUpVoted.put(postId,true));
-
-            Collections.sort(
-                    postDTOS,
-                    (postDTOa,postDTOb)-> (int) (postDTOb.getTotalUpVotes()-postDTOa.getTotalUpVotes())
+            /*<PostID,NumberOfBahOnPostGivenByUser>*/
+            HashMap<Long, MedalType> medalTypeGivenByLoggedInUser=new HashMap<>();
+            medalGivenPostOfCurrentlyLoggedInUser.forEach((medalDTO)->
+                    medalTypeGivenByLoggedInUser
+                            .put(
+                                    medalDTO.getPostId(),
+                                    medalDTO.getMedalType()
+                            )
             );
 
             postDTOS.forEach(postDTO ->
-                    postDTO.setPostUpVotedByCurrentUser(
-                            isUpVoted.getOrDefault(postDTO.getPostId(),false)
+                    postDTO.setMedalTypeProvidedByLoggedInUser(
+                            medalTypeGivenByLoggedInUser
+                                    .getOrDefault(postDTO.getPostId(),MedalType.NO_MEDAL)
                     )
             );
 
         } catch (UnauthorizedException unauthorizedException) {}
-
-        //Removing Comments From post
-        postDTOS.forEach(postDTO -> postDTO.setComments(null));
-
         return new ResponseEntity<>(postDTOS,HttpStatus.OK);
     }
 
@@ -117,7 +110,7 @@ public class UserController {
                 USER_NOT_FOUND_MSG
         );
 
-        user=Converters.convert(user,userDTO);
+        user=Converters.convert(userDTO,user);
         userRepository.save(user);
 
         return new ResponseEntity<>(user,HttpStatus.OK);
