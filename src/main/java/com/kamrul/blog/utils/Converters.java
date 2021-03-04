@@ -22,7 +22,7 @@ public class Converters {
         userDTO.setEmailVerified(user.getEmailVerified());
         userDTO.setEmailVisible(user.getEmailVisible());
         userDTO.setGender(user.getGender());
-        userDTO.setTotalBahUserGained(user.getTotalBahUserGained());
+        userDTO.setTotalNumberOfFollower(user.getTotalNumberOfFollower());
         return userDTO;
     }
 

@@ -23,7 +23,7 @@ public class Tag {
     @Column(name = "tag_name",nullable = false,unique = true)
     private String tagName;
 
-    @ManyToMany(mappedBy = "tags",fetch = FetchType.LAZY,cascade = CascadeType.REFRESH)
+    @ManyToMany(mappedBy = "tags",fetch = FetchType.LAZY,cascade = CascadeType.MERGE)
     @JsonIgnore
     private List<Post> posts;
 

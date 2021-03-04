@@ -12,6 +12,7 @@ import com.kamrul.blog.repositories.GeneralQueryRepository;
 import com.kamrul.blog.repositories.PostRepository;
 import com.kamrul.blog.repositories.MedalRepository;
 import com.kamrul.blog.repositories.UserRepository;
+import com.kamrul.blog.security.jwt.JWTUtil;
 import com.kamrul.blog.utils.Converters;
 import com.kamrul.blog.utils.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,14 +80,17 @@ public class PostController {
     }
 
     @GetMapping("/page/{pageId}")
-    public ResponseEntity<?> getPostByPage(@PathVariable(value = "pageId") Integer pageId)
+    public ResponseEntity<?> getPostByPage(
+            @PathVariable(value = "pageId") Integer pageId,
+            @RequestHeader("Authorization") String jwt)
     {
-        final Integer pageSize=10;
+
+        final Integer pageSize=50;
         Page<Post> postDTOPage=postRepository.getTopPost(PageRequest.of(pageId-1,pageSize));
         List<PostDTO> postDTOs=new ArrayList<>();
         postDTOPage.forEach(post -> postDTOs.add(Converters.convert(post,new PostDTO())));
         try {
-            Long loggedInUserId=GeneralQueryRepository.getCurrentlyLoggedInUserId();
+            Long loggedInUserId=JWTUtil.getUserIdFromJwt(jwt);
             List<MedalDTO> medalGivenPostIds=postRepository
                     .getPostForCurrentlyLoggedInUserOnWhichUserGivenMedal(loggedInUserId);
 
@@ -102,11 +106,14 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createPost(@RequestBody PostDTO postDTO)
+    public ResponseEntity<?> createPost(@RequestBody PostDTO postDTO,@RequestHeader("Authorization") String jwt)
             throws ResourceNotFoundException, UnauthorizedException {
+
+        Long loggedInUserId= JWTUtil.getUserIdFromJwt(jwt);
+
         User user= GeneralQueryRepository.getByID(
                 userRepository,
-                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
+                loggedInUserId,
                 USER_NOT_FOUND_MSG
         );
         postDTO.setUser(user);

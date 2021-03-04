@@ -19,6 +19,13 @@ public class JWTUtil {
     private final String SECRET_KEY="141D65%$14%2SA939H#20202f2425";
 
 
+    public static Long getUserIdFromJwt(String jwtFromReq) throws UnauthorizedException {
+        String jwt=jwtFromReq.substring(7);
+        Long userId=new JWTUtil().extractUserId(jwt);
+       return userId;
+    }
+
+
     public <T> T extractClaim(String token, Function<Claims,T> claimsResolver) throws UnauthorizedException {
         final Claims claims=extractAllClaims(token);
         return claimsResolver.apply(claims);
@@ -30,7 +37,7 @@ public class JWTUtil {
         }
         catch (ExpiredJwtException jwtException)
         {
-            throw new UnauthorizedException("Unvalid JWT, LogIn again");
+            throw new UnauthorizedException("UnValid JWT, LogIn again");
         }
     }
 

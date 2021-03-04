@@ -1,11 +1,9 @@
 package com.kamrul.blog.dto;
 
-import com.kamrul.blog.models.Comment;
 import com.kamrul.blog.models.MedalType;
 import com.kamrul.blog.models.Tag;
 import com.kamrul.blog.models.User;
 
-import javax.persistence.Column;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -137,4 +135,5 @@ public class PostDTO {
     public void setMedalTypeProvidedByLoggedInUser(MedalType medalTypeProvidedByLoggedInUser) {
         this.medalTypeProvidedByLoggedInUser = medalTypeProvidedByLoggedInUser;
     }
+
 }

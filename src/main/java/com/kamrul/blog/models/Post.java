@@ -55,7 +55,7 @@ public class Post {
     private Long totalGold;
 
 
-    @ManyToMany(cascade =CascadeType.REFRESH,fetch = FetchType.EAGER)
+    @ManyToMany(cascade =CascadeType.MERGE,fetch = FetchType.EAGER)
     @JoinTable(name = "post_tags",
             joinColumns = {@JoinColumn(name = "post_id")},
             inverseJoinColumns =  {@JoinColumn(name = "tag_id")}

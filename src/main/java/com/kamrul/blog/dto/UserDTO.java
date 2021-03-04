@@ -19,7 +19,8 @@ public class UserDTO {
     private String city;
     private String country;
     private String gender;
-    private Long totalBahUserGained;
+    private Long totalNumberOfFollower;
+    private Boolean isFollowedByCurrentlyLoggedInUser;
 
     public UserDTO(){}
 
@@ -129,11 +130,20 @@ public class UserDTO {
         isEmailVerified = emailVerified;
     }
 
-    public Long getTotalBahUserGained() {
-        return totalBahUserGained;
+
+    public Boolean getFollowedByCurrentlyLoggedInUser() {
+        return isFollowedByCurrentlyLoggedInUser;
     }
 
-    public void setTotalBahUserGained(Long totalBahUserGained) {
-        this.totalBahUserGained = totalBahUserGained;
+    public void setFollowedByCurrentlyLoggedInUser(Boolean followedByCurrentlyLoggedInUser) {
+        isFollowedByCurrentlyLoggedInUser = followedByCurrentlyLoggedInUser;
+    }
+
+    public Long getTotalNumberOfFollower() {
+        return totalNumberOfFollower;
+    }
+
+    public void setTotalNumberOfFollower(Long totalNumberOfFollower) {
+        this.totalNumberOfFollower = totalNumberOfFollower;
     }
 }

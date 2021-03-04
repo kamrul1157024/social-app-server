@@ -1,12 +1,12 @@
 package com.kamrul.blog.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(
@@ -16,7 +16,7 @@ import java.util.Objects;
                 @UniqueConstraint(name = "unique_email",columnNames = "email")
         }
 )
-public class User {
+public class User implements Comparable<User> {
 
     @Id
     @SequenceGenerator(
@@ -68,9 +68,6 @@ public class User {
     @Column(name = "gender",nullable = false)
     private String gender;
 
-    @Column(name = "bah_gained_by_user")
-    private Long totalBahUserGained;
-
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Post> posts;
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
@@ -82,28 +79,31 @@ public class User {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Medal> medals;
 
+    @Column(name = "total_number_of_follower",nullable = false)
+    private Long totalNumberOfFollower;
+
 
     @ManyToMany
     @JoinTable(
-            name = "follower",
-            joinColumns = @JoinColumn(name = "follower_id"),
-            inverseJoinColumns = @JoinColumn(name = "followee_id")
+            name = "follow",
+            joinColumns = @JoinColumn(name = "followed_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "followed_by_user_id")
     )
-    private List<User> follower;
+    private Set<User> followedBy;
+
     @ManyToMany
     @JoinTable(
-            name = "follower",
-            joinColumns = @JoinColumn(name = "followee_id"),
-            inverseJoinColumns = @JoinColumn(name = "follower_id")
+            name = "follow",
+            joinColumns = @JoinColumn(name = "followed_by_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "followed_user_id")
     )
-    private List<User> followee;
-
+    private Set<User> followed;
 
     private void init()
     {
         this.isEmailVisible=false;
         this.isEmailVerified=false;
-        totalBahUserGained=0L;
+        this.totalNumberOfFollower=0L;
     }
 
     public User(String userName, String firstName, String lastName, String email, String password,Date dateOfBirth) {
@@ -250,31 +250,30 @@ public class User {
         this.country = country;
     }
 
-    public Long getTotalBahUserGained() {
-        return totalBahUserGained;
+    @JsonBackReference("followed")
+    public Set<User> getFollowed() {
+        return followed;
     }
 
-    public void setTotalBahUserGained(Long totalBahUserGained) {
-        this.totalBahUserGained = totalBahUserGained;
+    public void setFollowed(Set<User> followed) {
+        this.followed = followed;
     }
 
-
-    @JsonBackReference
-    public List<User> getFollower() {
-        return follower;
+    @JsonBackReference("followedBy")
+    public Set<User> getFollowedBy() {
+        return followedBy;
     }
 
-    public void setFollower(List<User> follower) {
-        this.follower = follower;
+    public void setFollowedBy(Set<User> followedBy) {
+        this.followedBy = followedBy;
     }
 
-    @JsonBackReference
-    public List<User> getFollowee() {
-        return followee;
+    public Long getTotalNumberOfFollower() {
+        return totalNumberOfFollower;
     }
 
-    public void setFollowee(List<User> followee) {
-        this.followee = followee;
+    public void setTotalNumberOfFollower(Long totalNumberOfFollower) {
+        this.totalNumberOfFollower = totalNumberOfFollower;
     }
 
     @JsonBackReference
@@ -291,7 +290,12 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(userId, user.userId) && Objects.equals(userName, user.userName) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && Objects.equals(posts, user.posts);
+        return Objects.equals(userId, user.userId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, userName, profilePicture, firstName, lastName, email, city, country, gender, totalNumberOfFollower);
     }
 
     public String getGender() {
@@ -300,6 +304,14 @@ public class User {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    @Override
+    public int compareTo(User o) {
+        long diff=this.userId-o.getUserId();
+        if(diff<0) return -1;
+        else if(diff>0) return 1;
+        else return 0;
     }
 }
 

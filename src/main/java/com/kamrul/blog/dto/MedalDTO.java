@@ -8,9 +8,9 @@ public class MedalDTO {
     private Long medalId;
     private MedalType medalType;
 
-    public MedalDTO(Long medalId, MedalType medalType)
+    public MedalDTO(Long PostId, MedalType medalType)
     {
-        this.medalId=medalId;
+        this.postId=PostId;
         this.medalType=medalType;
     }
 
