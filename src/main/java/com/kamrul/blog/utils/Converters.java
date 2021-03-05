@@ -11,11 +11,17 @@ public class Converters {
 
     public static UserDTO convert(User user,UserDTO userDTO)
     {
+
+        userDTO.setUserId(user.getUserId());
         userDTO.setUserName(user.getUserName());
         userDTO.setFirstName(user.getFirstName());
         userDTO.setLastName(user.getLastName());
+
         userDTO.setDateOfBirth(user.getDateOfBirth());
-        userDTO.setEmail(user.getEmail());
+
+        if(user.getEmailVisible())
+            userDTO.setEmail(user.getEmail());
+
         userDTO.setProfilePicture(user.getProfilePicture());
         userDTO.setCity(user.getCity());
         userDTO.setCountry(user.getCountry());
@@ -23,6 +29,8 @@ public class Converters {
         userDTO.setEmailVisible(user.getEmailVisible());
         userDTO.setGender(user.getGender());
         userDTO.setTotalNumberOfFollower(user.getTotalNumberOfFollower());
+        userDTO.setTotalNumberOfUserFollowed(user.getTotalNumberOfUserFollowed());
+        userDTO.setUserDescription(user.getUserDescription());
         return userDTO;
     }
 
@@ -61,6 +69,8 @@ public class Converters {
             user.setProfilePicture(userDTO.getProfilePicture());
         if(userDTO.getGender()!=null)
             user.setGender(userDTO.getGender());
+        if(userDTO.getUserDescription()!=null)
+            user.setUserDescription(userDTO.getUserDescription());
         return user;
     }
 

@@ -11,6 +11,7 @@ import com.kamrul.blog.models.User;
 import com.kamrul.blog.repositories.GeneralQueryRepository;
 import com.kamrul.blog.repositories.PostRepository;
 import com.kamrul.blog.repositories.UserRepository;
+import com.kamrul.blog.security.jwt.JWTUtil;
 import com.kamrul.blog.utils.Converters;
 import com.kamrul.blog.utils.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,59 +44,66 @@ public class UserController {
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
 
-    @GetMapping("/currentlyLoggedInUser")
-    public ResponseEntity<?> getCurrentlyLoggedInUser()
-            throws ResourceNotFoundException, UnauthorizedException {
+    @GetMapping("/{userName}")
+    public ResponseEntity<?> getUserDetailsByUserName(@PathVariable("userName") String userName)
+            throws ResourceNotFoundException {
+        Optional<User> user=userRepository.findByUserName(userName);
+        if(user.isEmpty()) throw new ResourceNotFoundException(USER_NOT_FOUND_MSG);
+        UserDTO userDTO=Converters.convert(user.get(),new UserDTO());
+        return new ResponseEntity<>(userDTO,HttpStatus.OK);
+    }
 
+    @GetMapping("/currentlyLoggedInUser")
+    public ResponseEntity<?> getCurrentlyLoggedInUser(@RequestHeader("Authorization") String jwt)
+            throws ResourceNotFoundException, UnauthorizedException {
+        Long userId = JWTUtil.getUserIdFromJwt(jwt);
         User user= GeneralQueryRepository.getByID(
                 userRepository,
-                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
+                userId,
                 USER_NOT_FOUND_MSG);
-
-        UserDTO userDTO=new UserDTO();
-        userDTO= Converters.convert(user,userDTO);
-
-        return new ResponseEntity<>(userDTO,HttpStatus.OK);
+        return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
     @GetMapping("/posts")
     public ResponseEntity<?> getUserPost(
-            @RequestParam(value = "id") Long userId,
-            @RequestParam("pageNo") Integer pageNo
-    ) {
+            @RequestParam(value = "userId") Long userId,
+            @RequestParam("pageNo") Integer pageNo,
+            @RequestHeader("Authorization") Optional<String> jwtOptional
+    ) throws UnauthorizedException {
 
-        final Integer pageSize=10;
+        final Integer pageSize=40;
         Page<Post> postDTOPage=postRepository.getPostByUserId(userId, PageRequest.of(pageNo-1,pageSize));
         List<PostDTO> postDTOS = new ArrayList<>();
         postDTOPage.forEach(post -> postDTOS.add(Converters.convert(post,new PostDTO())));
-        try {
-            Long currentlyLoggedInUserId
-                    =GeneralQueryRepository.getCurrentlyLoggedInUserId();
 
-            List<MedalDTO> medalGivenPostOfCurrentlyLoggedInUser= postRepository
-                    .getPostIdForUserIdOnWhichCurrentlyLoggedInUserGivenMedal(
-                            currentlyLoggedInUserId,
-                            userId
-                    );
+        if(jwtOptional.isEmpty() || !jwtOptional.get().startsWith("Bearer")) return new ResponseEntity<>(postDTOS,HttpStatus.OK);
+        final String jwt=jwtOptional.get();
 
-            /*<PostID,NumberOfBahOnPostGivenByUser>*/
-            HashMap<Long, MedalType> medalTypeGivenByLoggedInUser=new HashMap<>();
-            medalGivenPostOfCurrentlyLoggedInUser.forEach((medalDTO)->
-                    medalTypeGivenByLoggedInUser
-                            .put(
-                                    medalDTO.getPostId(),
-                                    medalDTO.getMedalType()
-                            )
-            );
+        Long currentlyLoggedInUserId
+                =JWTUtil.getUserIdFromJwt(jwt);
 
-            postDTOS.forEach(postDTO ->
-                    postDTO.setMedalTypeProvidedByLoggedInUser(
-                            medalTypeGivenByLoggedInUser
-                                    .getOrDefault(postDTO.getPostId(),MedalType.NO_MEDAL)
-                    )
-            );
+        List<MedalDTO> medalGivenPostOfCurrentlyLoggedInUser= postRepository
+                .getPostIdForUserIdOnWhichCurrentlyLoggedInUserGivenMedal(
+                        currentlyLoggedInUserId,
+                        userId
+                );
 
-        } catch (UnauthorizedException unauthorizedException) {}
+        /*<PostID,NumberOfBahOnPostGivenByUser>*/
+        HashMap<Long, MedalType> medalTypeGivenByLoggedInUser=new HashMap<>();
+        medalGivenPostOfCurrentlyLoggedInUser.forEach((medalDTO)->
+                medalTypeGivenByLoggedInUser
+                        .put(
+                                medalDTO.getPostId(),
+                                medalDTO.getMedalType()
+                        )
+        );
+
+        postDTOS.forEach(postDTO ->
+                postDTO.setMedalTypeProvidedByLoggedInUser(
+                        medalTypeGivenByLoggedInUser
+                                .getOrDefault(postDTO.getPostId(),MedalType.NO_MEDAL)
+                )
+        );
         return new ResponseEntity<>(postDTOS,HttpStatus.OK);
     }
 

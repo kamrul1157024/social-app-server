@@ -15,7 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
+
+import javax.transaction.Transactional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,8 @@ public class FollowerController {
     private FollowerRepository followerRepository;
 
     @GetMapping("/allFollowedUserId")
-    ResponseEntity<?> getAllUserIdLoggedInUserFollows(@RequestHeader("Authorization") String jwt) throws UnauthorizedException {
+    ResponseEntity<?> getAllUserIdLoggedInUserFollows(@RequestHeader("Authorization") String jwt)
+            throws UnauthorizedException {
 
         /*Need to perform SQL Query Optimization*/
         Long loggedInUserId=JWTUtil.getUserIdFromJwt(jwt);
@@ -51,7 +53,11 @@ public class FollowerController {
     */
 
     @PutMapping
-    ResponseEntity<?>  followUserById(@RequestBody FollowDTO followDTO, @RequestHeader("Authorization") String jwt) throws UnauthorizedException, ResourceNotFoundException {
+    @Transactional
+    ResponseEntity<?>  followUserById(
+            @RequestBody FollowDTO followDTO,
+            @RequestHeader("Authorization") String jwt)
+            throws UnauthorizedException, ResourceNotFoundException {
         Long loggedInUserId= JWTUtil.getUserIdFromJwt(jwt);
         Long loggedInUsedWantsToFollowUserId= followDTO.getFollow();
 
@@ -68,7 +74,6 @@ public class FollowerController {
         );
 
         /* May required optimization on Saving on Table */
-
         Set<User> loggedInUserCurrentlyFollowed= loggedInUser.getFollowed();
         Boolean isPreviouslyFollowedByUser= loggedInUserCurrentlyFollowed
                 .stream()
@@ -78,13 +83,19 @@ public class FollowerController {
             /* Will get deleted Automatically From follow table */
             loggedInUserCurrentlyFollowed.remove(loggedInUserWantsToFollowUser);
             loggedInUser.setFollowed(loggedInUserCurrentlyFollowed);
-            loggedInUserWantsToFollowUser.setTotalNumberOfFollower(loggedInUserWantsToFollowUser.getTotalNumberOfFollower()-1);
+            loggedInUserWantsToFollowUser
+                    .setTotalNumberOfFollower(loggedInUserWantsToFollowUser.getTotalNumberOfFollower()-1);
+            loggedInUser
+                    .setTotalNumberOfUserFollowed(loggedInUser.getTotalNumberOfUserFollowed()-1);
         }
         else
         {
             loggedInUserCurrentlyFollowed.add(loggedInUserWantsToFollowUser);
             loggedInUser.setFollowed(loggedInUserCurrentlyFollowed);
-            loggedInUserWantsToFollowUser.setTotalNumberOfFollower(loggedInUserWantsToFollowUser.getTotalNumberOfFollower()+1);
+            loggedInUserWantsToFollowUser
+                    .setTotalNumberOfFollower(loggedInUserWantsToFollowUser.getTotalNumberOfFollower()+1);
+            loggedInUser
+                    .setTotalNumberOfUserFollowed(loggedInUser.getTotalNumberOfUserFollowed()+1);
 
         }
 

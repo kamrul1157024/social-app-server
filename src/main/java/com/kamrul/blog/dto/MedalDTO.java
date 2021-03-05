@@ -4,22 +4,22 @@ import com.kamrul.blog.models.MedalType;
 
 public class MedalDTO {
 
+    private Long userId;
     private Long postId;
-    private Long medalId;
     private MedalType medalType;
 
-    public MedalDTO(Long PostId, MedalType medalType)
-    {
-        this.postId=PostId;
-        this.medalType=medalType;
+    public MedalDTO(Long userId, Long postId, MedalType medalType) {
+        this.userId = userId;
+        this.postId = postId;
+        this.medalType = medalType;
     }
 
-    public Long getMedalId() {
-        return medalId;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setMedalId(Long medalId) {
-        this.medalId = medalId;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Long getPostId() {

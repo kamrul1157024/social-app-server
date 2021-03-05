@@ -82,6 +82,11 @@ public class User implements Comparable<User> {
     @Column(name = "total_number_of_follower",nullable = false)
     private Long totalNumberOfFollower;
 
+    @Column(name = "total_number_of_user_followed",nullable = false)
+    private Long totalNumberOfUserFollowed;
+
+    @Column(name = "userDescription",columnDefinition = "Text")
+    private String userDescription;
 
     @ManyToMany
     @JoinTable(
@@ -276,6 +281,22 @@ public class User implements Comparable<User> {
         this.totalNumberOfFollower = totalNumberOfFollower;
     }
 
+    public Long getTotalNumberOfUserFollowed() {
+        return totalNumberOfUserFollowed;
+    }
+
+    public void setTotalNumberOfUserFollowed(Long totalNumberOfUserFollowed) {
+        this.totalNumberOfUserFollowed = totalNumberOfUserFollowed;
+    }
+
+    public String getUserDescription() {
+        return userDescription;
+    }
+
+    public void setUserDescription(String userDescription) {
+        this.userDescription = userDescription;
+    }
+
     @JsonBackReference
     public List<Medal> getMedals() {
         return medals;
@@ -306,6 +327,8 @@ public class User implements Comparable<User> {
         this.gender = gender;
     }
 
+
+
     @Override
     public int compareTo(User o) {
         long diff=this.userId-o.getUserId();
@@ -313,6 +336,9 @@ public class User implements Comparable<User> {
         else if(diff>0) return 1;
         else return 0;
     }
+
+
+
 }
 
 

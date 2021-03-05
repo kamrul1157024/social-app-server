@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class UserDTO {
+    private Long userId;
     private String userName;
     private String firstName;
     private String lastName;
@@ -21,6 +22,8 @@ public class UserDTO {
     private String gender;
     private Long totalNumberOfFollower;
     private Boolean isFollowedByCurrentlyLoggedInUser;
+    private Long totalNumberOfUserFollowed;
+    private String userDescription;
 
     public UserDTO(){}
 
@@ -145,5 +148,29 @@ public class UserDTO {
 
     public void setTotalNumberOfFollower(Long totalNumberOfFollower) {
         this.totalNumberOfFollower = totalNumberOfFollower;
+    }
+
+    public Long getTotalNumberOfUserFollowed() {
+        return totalNumberOfUserFollowed;
+    }
+
+    public void setTotalNumberOfUserFollowed(Long totalNumberOfUserFollowed) {
+        this.totalNumberOfUserFollowed = totalNumberOfUserFollowed;
+    }
+
+    public String getUserDescription() {
+        return userDescription;
+    }
+
+    public void setUserDescription(String userDescription) {
+        this.userDescription = userDescription;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

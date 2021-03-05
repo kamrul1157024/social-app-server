@@ -1,69 +1,49 @@
 package com.kamrul.blog.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.kamrul.blog.dto.MedalDTO;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "medal")
 public class Medal {
 
-
-    @Id
-    @SequenceGenerator(
-            name = "medal_id_generator",
-            sequenceName = "medal_id_generator",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "medal_id_generator"
-    )
-    @Column(name = "medal_id",updatable = false)
-    private Long medalId;
-
-    @Column(name = "medal_type",nullable = false)
-    @Enumerated(EnumType.ORDINAL)
-    private MedalType medalType;
-
+    @EmbeddedId
+    MedalCompositeKey id;
+    @MapsId("userId")
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @MapsId("postId")
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public Medal(User user, Post post, MedalType medalGivenByUser) {
+    @Column(name = "medal_type")
+    MedalType medalType;
+
+    public Medal(MedalCompositeKey id, User user, Post post, MedalType medalType) {
+        this.id = id;
         this.user = user;
         this.post = post;
-        this.medalType=medalGivenByUser;
+        this.medalType = medalType;
     }
 
-    public Medal(Long medalId,User user,Post post) {
-        this.medalId = medalId;
-        this.user = user;
-        this.post = post;
+
+    public Medal() {
     }
 
-    public Medal(Medal medal,MedalType medalType)
-    {
-        this.medalId=medal.getMedalId();
-        this.user=medal.getUser();
-        this.post=medal.getPost();
-        this.medalType=medalType;
+    public MedalCompositeKey getId() {
+        return id;
     }
 
-    public Medal()
-    {
-
+    public void setId(MedalCompositeKey id) {
+        this.id = id;
     }
 
-    public Long getMedalId() {
-        return medalId;
-    }
-
+    @JsonBackReference
     public User getUser() {
         return user;
     }
@@ -72,7 +52,7 @@ public class Medal {
         this.user = user;
     }
 
-    @JsonBackReference("upvote_post")
+    @JsonBackReference
     public Post getPost() {
         return post;
     }
@@ -87,5 +67,18 @@ public class Medal {
 
     public void setMedalType(MedalType medalType) {
         this.medalType = medalType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Medal medal = (Medal) o;
+        return getId().equals(medal.getId()) && getUser().equals(medal.getUser()) && getPost().equals(medal.getPost()) && getMedalType() == medal.getMedalType();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getUser(), getPost(), getMedalType());
     }
 }

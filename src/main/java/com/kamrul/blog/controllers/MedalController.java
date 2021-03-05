@@ -4,20 +4,19 @@ import com.kamrul.blog.dto.PostDTO;
 import com.kamrul.blog.dto.MedalDTO;
 import com.kamrul.blog.exception.ResourceNotFoundException;
 import com.kamrul.blog.exception.UnauthorizedException;
-import com.kamrul.blog.models.MedalType;
-import com.kamrul.blog.models.Post;
-import com.kamrul.blog.models.Medal;
-import com.kamrul.blog.models.User;
+import com.kamrul.blog.models.*;
 import com.kamrul.blog.repositories.GeneralQueryRepository;
 import com.kamrul.blog.repositories.PostRepository;
 import com.kamrul.blog.repositories.MedalRepository;
 import com.kamrul.blog.repositories.UserRepository;
+import com.kamrul.blog.security.jwt.JWTUtil;
 import com.kamrul.blog.utils.Converters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -36,8 +35,15 @@ public class MedalController {
     private MedalRepository medalRepository;
 
     @PutMapping
-    ResponseEntity<?> giveMedalOnThePostByUser(@RequestBody MedalDTO medalDataFromUser)
+    @Transactional(rollbackOn = {Exception.class})
+    ResponseEntity<?> giveMedalOnThePostByUser(
+            @RequestBody MedalDTO medalDataFromUser,
+            @RequestHeader("Authorization") String jwt)
             throws UnauthorizedException, ResourceNotFoundException {
+
+        Long userId= JWTUtil.getUserIdFromJwt(jwt);
+        Long postId= medalDataFromUser.getPostId();
+        MedalType userProvidedMedalType=medalDataFromUser.getMedalType();
 
         Post post=GeneralQueryRepository.getByID(
                 postRepository,
@@ -47,33 +53,34 @@ public class MedalController {
 
         User user=GeneralQueryRepository.getByID(
                 userRepository,
-                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
+                userId,
                 USER_NOT_FOUND_MSG
         );
 
-        Optional<MedalDTO> optionalBah= medalRepository.
-                findMedalByUserIdAndPostID(user.getUserId(),post.getPostId());
-        final MedalType userProvidedMedalType=medalDataFromUser.getMedalType();
+        MedalCompositeKey medalCompositeKey= new MedalCompositeKey(userId,postId);
+
+        Optional<MedalDTO> optionalMedal= medalRepository.findMedalByCompositeKey(medalCompositeKey);
 
         /* Required SQL Query Optimization */
-        if(!optionalBah.isPresent())
+        if(!optionalMedal.isPresent())
         {
-            Medal medal =new Medal(user, post, userProvidedMedalType);
+            Medal medal =new Medal(medalCompositeKey,user, post, userProvidedMedalType);
             post.addMedalCount(userProvidedMedalType);
             medalRepository.save(medal);
         }
         else
         {
             /* Need to Perform Indexing on (userId,postId) */
-            MedalDTO previousMedalDto=optionalBah.get();
-            Medal medal=new Medal(previousMedalDto.getMedalId(),user,post);
-            Medal updatedMedal=new Medal(medal,userProvidedMedalType);
+            MedalDTO previousMedalDto=optionalMedal.get();
+            Medal previousMedal= new Medal(medalCompositeKey,user,post,previousMedalDto.getMedalType());
+            Medal updatedMedal=new Medal(medalCompositeKey,user,post,userProvidedMedalType);
             post.removePreviousMedalCount(previousMedalDto.getMedalType());
             post.addMedalCount(userProvidedMedalType);
             if(userProvidedMedalType==MedalType.NO_MEDAL)
-                medalRepository.deleteInBatch(Arrays.asList(medal));
+                medalRepository.deleteInBatch(Arrays.asList(previousMedal));
             else
                 medalRepository.save(updatedMedal);
+
         }
         PostDTO postDTO=new PostDTO();
         postDTO= Converters.convert(post,postDTO);
