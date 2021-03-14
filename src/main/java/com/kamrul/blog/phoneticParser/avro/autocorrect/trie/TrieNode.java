@@ -1,4 +1,4 @@
-package com.omicronlab.avro.autocorrect.trie;
+package com.kamrul.blog.phoneticParser.avro.autocorrect.trie;
 
 import java.util.HashMap;
 

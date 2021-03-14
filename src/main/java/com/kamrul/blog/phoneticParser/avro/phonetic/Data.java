@@ -25,7 +25,7 @@
     =============================================================================
 */
 
-package com.omicronlab.avro.phonetic;
+package com.kamrul.blog.phoneticParser.avro.phonetic;
 
 import java.util.ArrayList;
 import java.util.List;

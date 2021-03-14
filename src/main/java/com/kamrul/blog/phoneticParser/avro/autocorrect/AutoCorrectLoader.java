@@ -1,4 +1,4 @@
-package com.omicronlab.avro.autocorrect;
+package com.kamrul.blog.phoneticParser.avro.autocorrect;
 
 import org.json.JSONObject;
 
@@ -14,7 +14,7 @@ public class AutoCorrectLoader {
     {
          InputStream jsonDictInputStream=AutoCorrectLoader.class
                  .getClassLoader()
-                 .getResourceAsStream(String.valueOf(Path.of("autocorrect.json")));
+                 .getResourceAsStream("phoneticParser/autocorrect.json");
 
         try(BufferedReader bufferedReader
                     =new BufferedReader(

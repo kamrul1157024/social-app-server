@@ -1,4 +1,4 @@
-package com.omicronlab.avro.trie;
+package com.kamrul.blog.phoneticParser.avro.trie;
 import java.util.HashMap;
 
 public class TrieNode {

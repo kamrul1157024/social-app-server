@@ -26,9 +26,10 @@
 */
 
 
-package com.omicronlab.avro;
+package com.kamrul.blog.phoneticParser.avro;
 
-import com.omicronlab.avro.phonetic.Data;
+
+import com.kamrul.blog.phoneticParser.avro.phonetic.Data;
 
 public interface PhoneticLoader {
     public Data getData() throws Exception;

@@ -26,7 +26,7 @@
 */
 
 
-package com.omicronlab.avro.exception;
+package com.kamrul.blog.phoneticParser.avro.exception;
 
 public class NoPhoneticLoaderException extends Exception {
     private static final long serialVersionUID = 4198233633824036014L;

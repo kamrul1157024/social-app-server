@@ -25,7 +25,7 @@
     =============================================================================
 */
 
-package com.omicronlab.avro.phonetic;
+package com.kamrul.blog.phoneticParser.avro.phonetic;
 
 public class Match {
     private String type;

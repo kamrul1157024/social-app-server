@@ -1,8 +1,9 @@
-package com.omicronlab.avro.autocorrect.trie;
+package com.kamrul.blog.phoneticParser.avro.autocorrect.trie;
 
-import com.omicronlab.avro.autocorrect.AutoCorrectLoader;
+import com.kamrul.blog.phoneticParser.avro.autocorrect.AutoCorrectLoader;
 import org.json.JSONObject;
 
+import java.util.Iterator;
 import java.util.Locale;
 
 
@@ -11,15 +12,18 @@ public class AutoCorrectTrie {
     private AutoCorrectLoader autoCorrectLoader;
     private static volatile AutoCorrectTrie autoCorrectTrie=null;
 
-    private void init(AutoCorrectLoader autoCorrectLoader) throws Exception {
+    private void init(AutoCorrectLoader autoCorrectLoader)  {
 
         JSONObject jsonDict=autoCorrectLoader.getJsonDict();
 
-        jsonDict
-                .keySet()
-                .forEach(key->{
-                    insert(key, (String) jsonDict.get(key));
-                });
+        Iterator<String> jsonDictIterator=jsonDict.keys();
+
+
+        while (jsonDictIterator.hasNext())
+        {
+            String key= jsonDictIterator.next();
+            insert(key, (String) jsonDict.get(key));
+        }
 
     }
 

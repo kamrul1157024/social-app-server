@@ -1,8 +1,9 @@
-package com.omicronlab.avro.trie;
+package com.kamrul.blog.phoneticParser.avro.trie;
 
 
-import com.omicronlab.avro.PhoneticLoader;
-import com.omicronlab.avro.phonetic.Pattern;
+
+import com.kamrul.blog.phoneticParser.avro.PhoneticLoader;
+import com.kamrul.blog.phoneticParser.avro.phonetic.Pattern;
 
 import java.util.List;
 

@@ -1,11 +1,12 @@
-package com.omicronlab.avro;
+package com.kamrul.blog.phoneticParser.avro;
 
-import com.omicronlab.avro.exception.NoPhoneticLoaderException;
-import com.omicronlab.avro.phonetic.Data;
-import com.omicronlab.avro.phonetic.Match;
-import com.omicronlab.avro.phonetic.Pattern;
-import com.omicronlab.avro.phonetic.Rule;
-import com.omicronlab.avro.trie.AvroTrie;
+
+import com.kamrul.blog.phoneticParser.avro.exception.NoPhoneticLoaderException;
+import com.kamrul.blog.phoneticParser.avro.phonetic.Data;
+import com.kamrul.blog.phoneticParser.avro.phonetic.Match;
+import com.kamrul.blog.phoneticParser.avro.phonetic.Pattern;
+import com.kamrul.blog.phoneticParser.avro.phonetic.Rule;
+import com.kamrul.blog.phoneticParser.avro.trie.AvroTrie;
 
 import java.util.ArrayList;
 import java.util.List;

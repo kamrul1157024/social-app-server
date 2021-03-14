@@ -25,22 +25,28 @@
     =============================================================================
 */
 
-package com.omicronlab.avro;
+package com.kamrul.blog.phoneticParser.avro;
+
+import com.kamrul.blog.phoneticParser.avro.phonetic.Data;
+import com.kamrul.blog.phoneticParser.avro.phonetic.Match;
+import com.kamrul.blog.phoneticParser.avro.phonetic.Pattern;
+import com.kamrul.blog.phoneticParser.avro.phonetic.Rule;
+import org.apache.commons.digester3.Digester;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import org.apache.commons.digester3.Digester;
-import org.xml.sax.SAXException;
-import com.omicronlab.avro.phonetic.*;
 
 public class PhoneticXmlLoader implements PhoneticLoader {
 
     private URL url = null;
 
     public PhoneticXmlLoader() {
-        this.url = Data.class.getResource("phonetic.xml");
+        this.url = PhoneticXmlLoader
+                .class
+                .getClassLoader()
+                .getResource("phoneticParser/phonetic.xml");
     }
 
     public PhoneticXmlLoader(String path) throws MalformedURLException {
@@ -50,7 +56,6 @@ public class PhoneticXmlLoader implements PhoneticLoader {
     public Data getData() throws IOException, SAXException {
         Digester digester = new Digester();
         digester.setValidating(false);
-
         digester.addObjectCreate("data", Data.class);
         digester.addBeanPropertySetter("data/classes/vowel", "vowel");
         digester.addBeanPropertySetter("data/classes/consonant", "consonant");

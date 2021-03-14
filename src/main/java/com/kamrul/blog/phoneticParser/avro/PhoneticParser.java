@@ -1,8 +1,10 @@
-package com.omicronlab.avro;
+package com.kamrul.blog.phoneticParser.avro;
 
-import com.omicronlab.avro.autocorrect.AutoCorrectLoader;
-import com.omicronlab.avro.autocorrect.trie.AutoCorrectTrie;
-import com.omicronlab.avro.trie.AvroTrie;
+
+
+import com.kamrul.blog.phoneticParser.avro.autocorrect.AutoCorrectLoader;
+import com.kamrul.blog.phoneticParser.avro.autocorrect.trie.AutoCorrectTrie;
+import com.kamrul.blog.phoneticParser.avro.trie.AvroTrie;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +18,6 @@ public class PhoneticParser {
     private static AutoCorrectLoader autoCorrectLoader=null;
     private static AutoCorrectTrie autoCorrectTrie=null;
     private static TriePhoneticParser triePhoneticParser=null;
-    private Object CloneNotSupportedException;
 
     private PhoneticParser() throws Exception {
 
