@@ -1,7 +1,6 @@
 package com.kamrul.blog.repositories;
 
-import com.kamrul.blog.dto.CommentDTO;
-import com.kamrul.blog.models.Comment;
+import com.kamrul.blog.models.comment.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -4,7 +4,7 @@ import com.kamrul.blog.dto.FollowDTO;
 import com.kamrul.blog.dto.UserDTO;
 import com.kamrul.blog.exception.ResourceNotFoundException;
 import com.kamrul.blog.exception.UnauthorizedException;
-import com.kamrul.blog.models.User;
+import com.kamrul.blog.models.user.User;
 import com.kamrul.blog.repositories.FollowerRepository;
 import com.kamrul.blog.repositories.GeneralQueryRepository;
 import com.kamrul.blog.repositories.UserRepository;
@@ -53,7 +53,7 @@ public class FollowerController {
     */
 
     @PutMapping
-    @Transactional
+    @Transactional(rollbackOn = {Exception.class})
     ResponseEntity<?>  followUserById(
             @RequestBody FollowDTO followDTO,
             @RequestHeader("Authorization") String jwt)

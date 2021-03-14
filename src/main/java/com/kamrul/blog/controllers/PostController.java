@@ -4,7 +4,10 @@ import com.kamrul.blog.dto.MedalDTO;
 import com.kamrul.blog.dto.PostDTO;
 import com.kamrul.blog.exception.ResourceNotFoundException;
 import com.kamrul.blog.exception.UnauthorizedException;
-import com.kamrul.blog.models.*;
+import com.kamrul.blog.models.medal.MedalCompositeKey;
+import com.kamrul.blog.models.medal.MedalType;
+import com.kamrul.blog.models.post.Post;
+import com.kamrul.blog.models.user.User;
 import com.kamrul.blog.repositories.GeneralQueryRepository;
 import com.kamrul.blog.repositories.PostRepository;
 import com.kamrul.blog.repositories.MedalRepository;
@@ -19,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 import static com.kamrul.blog.utils.GeneralResponseMSG.*;
@@ -48,9 +52,9 @@ public class PostController {
         );
         PostDTO postDTO=new PostDTO();
         postDTO= Converters.convert(post,postDTO);
-        if(jwtOptional.isEmpty()) return new ResponseEntity<>(postDTO,HttpStatus.OK);
-        Long loggedInUserId=JWTUtil.getUserIdFromJwt(jwtOptional.get());
+        if(jwtOptional.isEmpty() || !jwtOptional.get().startsWith("Bearer")) return new ResponseEntity<>(postDTO,HttpStatus.OK);
 
+        Long loggedInUserId=JWTUtil.getUserIdFromJwt(jwtOptional.get());
         MedalCompositeKey medalCompositeKey= new MedalCompositeKey(loggedInUserId,postId);
         Optional<MedalDTO> medal= medalRepository.findMedalByCompositeKey(medalCompositeKey);
         MedalType medalGivenByLoggedInUser= medal.isPresent()? medal.get().getMedalType() : MedalType.NO_MEDAL;
@@ -80,7 +84,7 @@ public class PostController {
 
         if(jwt.isEmpty() || !jwt.get().startsWith("Bearer")) return new ResponseEntity<>(postDTOs,HttpStatus.OK);
         Long loggedInUserId=JWTUtil.getUserIdFromJwt(jwt.get());
-        List<MedalDTO> medalGivenPostIds=postRepository
+        List<MedalDTO> medalGivenPostIds=medalRepository
                 .getPostForCurrentlyLoggedInUserOnWhichUserGivenMedal(loggedInUserId);
         //<PostID, MedalType>
         HashMap<Long,MedalType> medalTypeGivenByUser=new HashMap<>();
@@ -91,11 +95,13 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createPost(@RequestBody PostDTO postDTO,@RequestHeader("Authorization") String jwt)
+    @Transactional(rollbackOn = {Exception.class})
+    public ResponseEntity<?> createPost(
+            @RequestBody PostDTO postDTO,
+            @RequestHeader("Authorization") String jwt)
             throws ResourceNotFoundException, UnauthorizedException {
 
         Long loggedInUserId= JWTUtil.getUserIdFromJwt(jwt);
-
         User user= GeneralQueryRepository.getByID(
                 userRepository,
                 loggedInUserId,
@@ -109,6 +115,7 @@ public class PostController {
     }
 
     @PutMapping
+    @Transactional(rollbackOn = {Exception.class})
     public ResponseEntity<?> updatePost(@RequestBody PostDTO postDetails) throws ResourceNotFoundException, UnauthorizedException {
 
         User user= GeneralQueryRepository.getByID(

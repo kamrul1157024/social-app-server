@@ -1,6 +1,6 @@
 package com.kamrul.blog.security.models;
 
-import com.kamrul.blog.models.User;
+import com.kamrul.blog.models.user.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,6 +1,8 @@
-package com.kamrul.blog.models;
+package com.kamrul.blog.models.medal;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.kamrul.blog.models.post.Post;
+import com.kamrul.blog.models.user.User;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -43,7 +45,7 @@ public class Medal {
         this.id = id;
     }
 
-    @JsonBackReference
+    @JsonBackReference("medal_user")
     public User getUser() {
         return user;
     }
@@ -52,7 +54,7 @@ public class Medal {
         this.user = user;
     }
 
-    @JsonBackReference
+    @JsonBackReference("medal_post")
     public Post getPost() {
         return post;
     }

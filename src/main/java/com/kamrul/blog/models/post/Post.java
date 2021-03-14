@@ -1,6 +1,11 @@
-package com.kamrul.blog.models;
+package com.kamrul.blog.models.post;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.kamrul.blog.models.tag.Tag;
+import com.kamrul.blog.models.user.User;
+import com.kamrul.blog.models.comment.Comment;
+import com.kamrul.blog.models.medal.Medal;
+import com.kamrul.blog.models.medal.MedalType;
 
 import javax.persistence.*;
 import java.util.Date;

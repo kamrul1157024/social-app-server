@@ -1,7 +1,8 @@
-package com.kamrul.blog.models;
+package com.kamrul.blog.models.comment;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kamrul.blog.models.post.Post;
+import com.kamrul.blog.models.user.User;
 
 import javax.persistence.*;
 import java.util.Date;

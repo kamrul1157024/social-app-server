@@ -3,9 +3,9 @@ package com.kamrul.blog.controllers;
 import com.kamrul.blog.dto.CommentReplyDTO;
 import com.kamrul.blog.exception.ResourceNotFoundException;
 import com.kamrul.blog.exception.UnauthorizedException;
-import com.kamrul.blog.models.Comment;
-import com.kamrul.blog.models.CommentReply;
-import com.kamrul.blog.models.User;
+import com.kamrul.blog.models.comment.Comment;
+import com.kamrul.blog.models.comment.CommentReply;
+import com.kamrul.blog.models.user.User;
 import com.kamrul.blog.repositories.*;
 import com.kamrul.blog.utils.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,6 +52,7 @@ public class CommentReplyController {
     }
 
     @PostMapping
+    @Transactional(rollbackOn = {Exception.class})
     public ResponseEntity<?> createCommentReply(@RequestBody CommentReplyDTO commentReplyDTO)
             throws ResourceNotFoundException, UnauthorizedException {
 
@@ -78,6 +80,7 @@ public class CommentReplyController {
     }
 
     @PutMapping
+    @Transactional(rollbackOn = {Exception.class})
     public ResponseEntity<?> updateCommentReply(@RequestBody CommentReplyDTO commentReplyDTO)
             throws ResourceNotFoundException, UnauthorizedException
     {

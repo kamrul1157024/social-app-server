@@ -1,6 +1,11 @@
-package com.kamrul.blog.models;
+package com.kamrul.blog.models.user;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.kamrul.blog.models.booklet.Booklet;
+import com.kamrul.blog.models.comment.Comment;
+import com.kamrul.blog.models.comment.CommentReply;
+import com.kamrul.blog.models.medal.Medal;
+import com.kamrul.blog.models.post.Post;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -85,8 +90,12 @@ public class User implements Comparable<User> {
     @Column(name = "total_number_of_user_followed",nullable = false)
     private Long totalNumberOfUserFollowed;
 
-    @Column(name = "userDescription",columnDefinition = "Text")
+    @Column(name = "user_description",columnDefinition = "Text")
     private String userDescription;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Booklet> booklets;
+
 
     @ManyToMany
     @JoinTable(
@@ -297,13 +306,23 @@ public class User implements Comparable<User> {
         this.userDescription = userDescription;
     }
 
-    @JsonBackReference
+    @JsonBackReference("user_medal")
     public List<Medal> getMedals() {
         return medals;
     }
 
     public void setMedals(List<Medal> medals) {
         this.medals = medals;
+    }
+
+
+    @JsonBackReference("user_booklet")
+    public List<Booklet> getBooklets() {
+        return booklets;
+    }
+
+    public void setBooklets(List<Booklet> booklets) {
+        this.booklets = booklets;
     }
 
     @Override

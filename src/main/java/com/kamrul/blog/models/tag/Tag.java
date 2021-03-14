@@ -1,6 +1,7 @@
-package com.kamrul.blog.models;
+package com.kamrul.blog.models.tag;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kamrul.blog.models.post.Post;
 
 import javax.persistence.*;
 import java.util.List;

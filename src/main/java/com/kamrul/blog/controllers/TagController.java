@@ -1,7 +1,7 @@
 package com.kamrul.blog.controllers;
 
-import com.kamrul.blog.models.Post;
-import com.kamrul.blog.models.Tag;
+import com.kamrul.blog.models.post.Post;
+import com.kamrul.blog.models.tag.Tag;
 import com.kamrul.blog.repositories.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

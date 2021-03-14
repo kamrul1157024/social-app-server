@@ -2,7 +2,7 @@ package com.kamrul.blog.security.services;
 
 import com.kamrul.blog.dto.UserDTO;
 import com.kamrul.blog.exception.UnauthorizedException;
-import com.kamrul.blog.models.User;
+import com.kamrul.blog.models.user.User;
 import com.kamrul.blog.repositories.UserRepository;
 import com.kamrul.blog.security.jwt.JWTUtil;
 import com.kamrul.blog.security.models.AppUserDetails;

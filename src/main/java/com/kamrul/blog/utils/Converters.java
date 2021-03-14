@@ -2,8 +2,8 @@ package com.kamrul.blog.utils;
 
 import com.kamrul.blog.dto.PostDTO;
 import com.kamrul.blog.dto.UserDTO;
-import com.kamrul.blog.models.Post;
-import com.kamrul.blog.models.User;
+import com.kamrul.blog.models.post.Post;
+import com.kamrul.blog.models.user.User;
 
 
 public class Converters {

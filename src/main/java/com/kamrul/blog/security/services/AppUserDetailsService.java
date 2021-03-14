@@ -1,6 +1,6 @@
 package com.kamrul.blog.security.services;
 
-import com.kamrul.blog.models.User;
+import com.kamrul.blog.models.user.User;
 import com.kamrul.blog.repositories.UserRepository;
 import com.kamrul.blog.security.models.AppUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;

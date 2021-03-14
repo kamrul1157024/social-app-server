@@ -1,4 +1,4 @@
-package com.kamrul.blog.models;
+package com.kamrul.blog.models.medal;
 
 
 import javax.persistence.Embeddable;

@@ -5,12 +5,11 @@ import com.kamrul.blog.dto.PostDTO;
 import com.kamrul.blog.dto.UserDTO;
 import com.kamrul.blog.exception.ResourceNotFoundException;
 import com.kamrul.blog.exception.UnauthorizedException;
-import com.kamrul.blog.models.MedalType;
-import com.kamrul.blog.models.Post;
-import com.kamrul.blog.models.User;
-import com.kamrul.blog.repositories.GeneralQueryRepository;
-import com.kamrul.blog.repositories.PostRepository;
-import com.kamrul.blog.repositories.UserRepository;
+import com.kamrul.blog.models.booklet.Booklet;
+import com.kamrul.blog.models.medal.MedalType;
+import com.kamrul.blog.models.post.Post;
+import com.kamrul.blog.models.user.User;
+import com.kamrul.blog.repositories.*;
 import com.kamrul.blog.security.jwt.JWTUtil;
 import com.kamrul.blog.utils.Converters;
 import com.kamrul.blog.utils.Message;
@@ -31,6 +30,10 @@ public class UserController {
     private UserRepository userRepository;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private MedalRepository medalRepository;
+    @Autowired
+    private BookletRepository bookletRepository;
 
     @GetMapping("/details")
     public ResponseEntity<?> getUserDetails(@RequestParam(value = "id") Long userId)
@@ -82,7 +85,7 @@ public class UserController {
         Long currentlyLoggedInUserId
                 =JWTUtil.getUserIdFromJwt(jwt);
 
-        List<MedalDTO> medalGivenPostOfCurrentlyLoggedInUser= postRepository
+        List<MedalDTO> medalGivenPostOfCurrentlyLoggedInUser= medalRepository
                 .getPostIdForUserIdOnWhichCurrentlyLoggedInUserGivenMedal(
                         currentlyLoggedInUserId,
                         userId
@@ -105,6 +108,20 @@ public class UserController {
                 )
         );
         return new ResponseEntity<>(postDTOS,HttpStatus.OK);
+    }
+
+
+    @GetMapping("/booklet")
+    ResponseEntity<?> getUserBooklet(@RequestParam("userId")Long userId)
+            throws ResourceNotFoundException {
+        /*Just To through ResourceNotFoundException*/
+        GeneralQueryRepository.getByID(
+                userRepository,
+                userId,
+                USER_NOT_FOUND_MSG
+        );
+        List<Booklet> userBookLets=bookletRepository.getBookletByUserId(userId);
+        return new ResponseEntity<>(userBookLets,HttpStatus.OK);
     }
 
 

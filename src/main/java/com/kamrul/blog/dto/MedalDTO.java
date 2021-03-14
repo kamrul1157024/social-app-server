@@ -1,6 +1,6 @@
 package com.kamrul.blog.dto;
 
-import com.kamrul.blog.models.MedalType;
+import com.kamrul.blog.models.medal.MedalType;
 
 public class MedalDTO {
 

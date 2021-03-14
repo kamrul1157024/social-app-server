@@ -1,7 +1,7 @@
 package com.kamrul.blog.repositories;
 
-import com.kamrul.blog.models.Post;
-import com.kamrul.blog.models.Tag;
+import com.kamrul.blog.models.post.Post;
+import com.kamrul.blog.models.tag.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
