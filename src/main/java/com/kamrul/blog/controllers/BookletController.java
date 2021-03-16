@@ -46,7 +46,6 @@ public class BookletController {
     @Transactional(rollbackOn = {Exception.class})
     ResponseEntity<?> postBooklet(
             @RequestBody  Booklet booklet,
-
             @RequestHeader("Authorization")Optional<String> jwt)
             throws UnauthorizedException, ResourceNotFoundException {
 

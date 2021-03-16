@@ -7,7 +7,6 @@ import com.kamrul.blog.phoneticParser.avro.autocorrect.trie.AutoCorrectTrie;
 import com.kamrul.blog.phoneticParser.avro.trie.AvroTrie;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class PhoneticParser {
@@ -55,34 +54,15 @@ public class PhoneticParser {
         return banglaText;
     }
 
-    private String autoCorrectString(String text)
+    public String autoCorrectString(String text)
     {
-        String[] words= sentenceSplit(text);
+        String[] words= text.split("\\s+");
 
-        List<String> autoCorrectedWords=
-                Arrays
-                        .stream(words).map(word->autoCorrectTrie.getReplacement(word))
-                        .collect(Collectors.toList());
+        return Arrays
+                .stream(words)
+                .map(word->autoCorrectTrie.getReplacement(word))
+                .collect(Collectors.joining(" "));
 
-        String autoCorrectedText=stringListToSentence(autoCorrectedWords);
-        return autoCorrectedText;
     }
-
-    private String[] sentenceSplit(String text)
-    {
-        return text.split("\\s+");
-    }
-
-    private String stringListToSentence(List<String> words)
-    {
-     StringBuilder sentence = new StringBuilder();
-     words.forEach(word->{
-         sentence.append(word);
-         sentence.append(" ");
-     });
-     return sentence.toString();
-    }
-
-
 
 }

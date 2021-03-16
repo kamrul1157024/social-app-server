@@ -72,23 +72,39 @@ public class AutoCorrectTrie {
         current.setReplace(replacement);
     }
 
+    /*  iphoneer -> this does not belong to dictionary
+    * but iphone is not in dictionary so longest prefix
+    * need to be matched and convert to aEiphoner */
+
+    private String replacementSegment(String find,int matchedLength,String replacement)
+    {
+        if (find.equals(replacement)|| replacement==null) return find;
+        String suffixToBePreserved= find.substring(matchedLength);
+
+        return replacement
+                .concat(" ")
+                .concat(suffixToBePreserved);
+    }
 
     public String getReplacement(String find)
     {
+        String findActual= find;
         find=find.toLowerCase(Locale.ROOT);
         TrieNode current=head;
+        String replacement=null;
+        int matchedLength=0;
         for(int i=0;i<find.length();i++)
         {
             char currentChar=find.charAt(i);
             if(current.getNextNode(currentChar)!=null) {
                 current = current.getNextNode(currentChar);
+                replacement=current.getReplace();
+                matchedLength++;
             }
             else
-                return find;
+                return replacementSegment(findActual,matchedLength,replacement);
         }
-        if (current.isEnd()) return current.getReplace();
-        else
-            return find;
+        return replacementSegment(findActual,matchedLength,replacement);
     }
 
 }

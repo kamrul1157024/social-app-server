@@ -29,6 +29,13 @@ class PhoneticParserTest {
     }
 
     @Test
+    void phoneticParserAutoCorrectedStringTest()
+    {
+        String text="aTA gase Tota Pakhi";
+        assertEquals(text,phoneticParser.autoCorrectString(text));
+    }
+
+    @Test
     void phoneParserAutoWithAutoCorrectTest()
     {
         assertEquals("আমি আইফোন কিনব ",

@@ -118,6 +118,7 @@ public class User implements Comparable<User> {
         this.isEmailVisible=false;
         this.isEmailVerified=false;
         this.totalNumberOfFollower=0L;
+        this.totalNumberOfUserFollowed=0L;
     }
 
     public User(String userName, String firstName, String lastName, String email, String password,Date dateOfBirth) {

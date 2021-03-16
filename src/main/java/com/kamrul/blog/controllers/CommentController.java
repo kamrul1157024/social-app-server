@@ -11,6 +11,8 @@ import com.kamrul.blog.repositories.CommentRepository;
 import com.kamrul.blog.repositories.GeneralQueryRepository;
 import com.kamrul.blog.repositories.PostRepository;
 import com.kamrul.blog.repositories.UserRepository;
+import com.kamrul.blog.services.verify.Verifier;
+import com.kamrul.blog.services.verify.exception.VerificationException;
 import com.kamrul.blog.utils.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +36,9 @@ public class CommentController {
     UserRepository userRepository;
     @Autowired
     PostRepository postRepository;
+    @Autowired
+    Verifier<Comment> commentVerifier;
+
 
     @GetMapping
     public ResponseEntity<?> getCommentById(@RequestParam(value = "id") Long commentId)
@@ -55,7 +60,7 @@ public class CommentController {
     @PostMapping
     @Transactional(rollbackOn = {Exception.class})
     public ResponseEntity<?> createComment(@RequestBody CommentDTO commentDTO)
-            throws ResourceNotFoundException, UnauthorizedException {
+            throws ResourceNotFoundException, UnauthorizedException, VerificationException {
 
         User user= GeneralQueryRepository.getByID(
                 userRepository,
@@ -74,6 +79,8 @@ public class CommentController {
         comment.setCommentText(commentDTO.getCommentText());
         comment.setUser(user);
         comment.setPost(post);
+
+        commentVerifier.verify(comment);
 
         commentRepository.save(comment);
 

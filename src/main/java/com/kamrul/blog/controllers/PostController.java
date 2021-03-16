@@ -13,6 +13,8 @@ import com.kamrul.blog.repositories.PostRepository;
 import com.kamrul.blog.repositories.MedalRepository;
 import com.kamrul.blog.repositories.UserRepository;
 import com.kamrul.blog.security.jwt.JWTUtil;
+import com.kamrul.blog.services.verify.Verifier;
+import com.kamrul.blog.services.verify.exception.VerificationException;
 import com.kamrul.blog.utils.Converters;
 import com.kamrul.blog.utils.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +33,16 @@ import static com.kamrul.blog.utils.GeneralResponseMSG.*;
 @RestController
 @RequestMapping("/api/post")
 public class PostController {
+
     @Autowired
     private PostRepository postRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private MedalRepository medalRepository;
+    @Autowired
+    private Verifier<Post> postVerifier;
+
 
     @GetMapping
     public ResponseEntity<?> getPostById(
@@ -50,8 +56,10 @@ public class PostController {
                 postId,
                 POST_NOT_FOUND_MSG
         );
+
         PostDTO postDTO=new PostDTO();
         postDTO= Converters.convert(post,postDTO);
+
         if(jwtOptional.isEmpty() || !jwtOptional.get().startsWith("Bearer")) return new ResponseEntity<>(postDTO,HttpStatus.OK);
 
         Long loggedInUserId=JWTUtil.getUserIdFromJwt(jwtOptional.get());
@@ -99,7 +107,7 @@ public class PostController {
     public ResponseEntity<?> createPost(
             @RequestBody PostDTO postDTO,
             @RequestHeader("Authorization") String jwt)
-            throws ResourceNotFoundException, UnauthorizedException {
+            throws ResourceNotFoundException, UnauthorizedException, VerificationException {
 
         Long loggedInUserId= JWTUtil.getUserIdFromJwt(jwt);
         User user= GeneralQueryRepository.getByID(
@@ -110,13 +118,17 @@ public class PostController {
         postDTO.setUser(user);
         Post post=new Post();
         post=Converters.convert(postDTO,post);
+
+        postVerifier.verify(post);
+
         postRepository.save(post);
         return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
     }
 
     @PutMapping
     @Transactional(rollbackOn = {Exception.class})
-    public ResponseEntity<?> updatePost(@RequestBody PostDTO postDetails) throws ResourceNotFoundException, UnauthorizedException {
+    public ResponseEntity<?> updatePost(@RequestBody PostDTO postDetails)
+            throws ResourceNotFoundException, UnauthorizedException, VerificationException {
 
         User user= GeneralQueryRepository.getByID(
                 userRepository,
@@ -132,6 +144,8 @@ public class PostController {
             throw new UnauthorizedException("User Do no have permission to Update this post");
 
         post=Converters.convert(postDetails,post);
+
+        postVerifier.verify(post);
 
         postRepository.save(post);
         return new ResponseEntity<>(post,HttpStatus.OK);

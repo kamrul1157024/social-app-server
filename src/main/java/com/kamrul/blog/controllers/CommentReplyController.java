@@ -7,6 +7,8 @@ import com.kamrul.blog.models.comment.Comment;
 import com.kamrul.blog.models.comment.CommentReply;
 import com.kamrul.blog.models.user.User;
 import com.kamrul.blog.repositories.*;
+import com.kamrul.blog.services.verify.Verifier;
+import com.kamrul.blog.services.verify.exception.VerificationException;
 import com.kamrul.blog.utils.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,7 +32,8 @@ public class CommentReplyController {
     CommentRepository commentRepository;
     @Autowired
     UserRepository userRepository;
-
+    @Autowired
+    Verifier<CommentReply> commentReplyVerifier;
 
     @GetMapping
     public ResponseEntity<?> getCommentReplyById(@RequestParam(value = "id") Long commentReplyId)
@@ -54,7 +57,7 @@ public class CommentReplyController {
     @PostMapping
     @Transactional(rollbackOn = {Exception.class})
     public ResponseEntity<?> createCommentReply(@RequestBody CommentReplyDTO commentReplyDTO)
-            throws ResourceNotFoundException, UnauthorizedException {
+            throws ResourceNotFoundException, UnauthorizedException, VerificationException {
 
         User user= GeneralQueryRepository.getByID(
                 userRepository,
@@ -74,6 +77,8 @@ public class CommentReplyController {
         commentReply.setComment(comment);
         commentReply.setUser(user);
 
+        commentReplyVerifier.verify(commentReply);
+
         commentReplyRepository.save(commentReply);
 
         return new ResponseEntity<>(commentReply, HttpStatus.ACCEPTED);
@@ -82,8 +87,7 @@ public class CommentReplyController {
     @PutMapping
     @Transactional(rollbackOn = {Exception.class})
     public ResponseEntity<?> updateCommentReply(@RequestBody CommentReplyDTO commentReplyDTO)
-            throws ResourceNotFoundException, UnauthorizedException
-    {
+            throws ResourceNotFoundException, UnauthorizedException, VerificationException {
         User user= GeneralQueryRepository.getByID(
                 userRepository,
                 GeneralQueryRepository.getCurrentlyLoggedInUserId(),
@@ -102,6 +106,7 @@ public class CommentReplyController {
 
         commentReply.setCommentReplyText(commentReplyDTO.getCommentReplyText());
 
+        commentReplyVerifier.verify(commentReply);
         commentReplyRepository.save(commentReply);
 
         return new ResponseEntity<>(commentReply,HttpStatus.OK);

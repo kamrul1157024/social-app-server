@@ -1,6 +1,7 @@
 package com.kamrul.blog.models.post;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.kamrul.blog.configuration.Verifiable;
 import com.kamrul.blog.models.tag.Tag;
 import com.kamrul.blog.models.user.User;
 import com.kamrul.blog.models.comment.Comment;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "post")
-public class Post {
+public class Post implements Verifiable {
 
 
     @Id
