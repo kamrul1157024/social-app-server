@@ -6,6 +6,7 @@ import com.kamrul.blog.models.comment.Comment;
 import com.kamrul.blog.models.comment.CommentReply;
 import com.kamrul.blog.models.medal.Medal;
 import com.kamrul.blog.models.post.Post;
+import com.kamrul.blog.models.savedPost.SavedPost;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -72,18 +73,6 @@ public class User implements Comparable<User> {
 
     @Column(name = "gender",nullable = false)
     private String gender;
-
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<Post> posts;
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<Comment> comments;
-
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<CommentReply> commentReplies;
-
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<Medal> medals;
-
     @Column(name = "total_number_of_follower",nullable = false)
     private Long totalNumberOfFollower;
 
@@ -92,6 +81,18 @@ public class User implements Comparable<User> {
 
     @Column(name = "user_description",columnDefinition = "Text")
     private String userDescription;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Post> posts;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<CommentReply> commentReplies;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Medal> medals;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Booklet> booklets;
@@ -112,6 +113,11 @@ public class User implements Comparable<User> {
             inverseJoinColumns = @JoinColumn(name = "followed_user_id")
     )
     private Set<User> followed;
+
+
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    private Set<SavedPost> savedPosts;
+
 
     private void init()
     {
@@ -324,6 +330,15 @@ public class User implements Comparable<User> {
 
     public void setBooklets(List<Booklet> booklets) {
         this.booklets = booklets;
+    }
+
+    @JsonBackReference
+    public Set<SavedPost> getSavedPosts() {
+        return savedPosts;
+    }
+
+    public void setSavedPosts(Set<SavedPost> savedPosts) {
+        this.savedPosts = savedPosts;
     }
 
     @Override

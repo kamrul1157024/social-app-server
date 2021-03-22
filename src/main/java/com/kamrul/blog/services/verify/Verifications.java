@@ -18,7 +18,7 @@ public abstract class Verifications{
         String postText= draftJSPostText.getAllText();
         TextAnalyzingResponse textAnalyzingResponse=
                 filterPost.isPoliticalStatement(postText);
-        if (textAnalyzingResponse.getProbabilityOfBeingPolitical()>.8)
+        if (textAnalyzingResponse.getProbabilityOfBeingPolitical()>=.5)
             throw new PoliticalPostException();
     }
 

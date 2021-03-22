@@ -1,6 +1,7 @@
 package com.kamrul.blog.models.medal;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.kamrul.blog.models.compositeKey.UserAndPostCompositeKey;
 import com.kamrul.blog.models.post.Post;
 import com.kamrul.blog.models.user.User;
 
@@ -12,7 +13,7 @@ import java.util.Objects;
 public class Medal {
 
     @EmbeddedId
-    MedalCompositeKey id;
+    UserAndPostCompositeKey id;
     @MapsId("userId")
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -26,7 +27,7 @@ public class Medal {
     @Column(name = "medal_type")
     MedalType medalType;
 
-    public Medal(MedalCompositeKey id, User user, Post post, MedalType medalType) {
+    public Medal(UserAndPostCompositeKey id, User user, Post post, MedalType medalType) {
         this.id = id;
         this.user = user;
         this.post = post;
@@ -37,11 +38,11 @@ public class Medal {
     public Medal() {
     }
 
-    public MedalCompositeKey getId() {
+    public UserAndPostCompositeKey getId() {
         return id;
     }
 
-    public void setId(MedalCompositeKey id) {
+    public void setId(UserAndPostCompositeKey id) {
         this.id = id;
     }
 

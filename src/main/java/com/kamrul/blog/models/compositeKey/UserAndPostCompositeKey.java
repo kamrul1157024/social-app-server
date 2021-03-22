@@ -1,22 +1,25 @@
-package com.kamrul.blog.models.medal;
+package com.kamrul.blog.models.compositeKey;
 
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class MedalCompositeKey implements Serializable {
+public class UserAndPostCompositeKey implements Serializable {
 
-    private Long postId;
+    @Column(name = "user_id")
     private Long userId;
+    @Column(name = "post_id")
+    private Long postId;
 
-    public MedalCompositeKey(Long userId,Long postId) {
+    public UserAndPostCompositeKey(Long userId, Long postId) {
         this.postId = postId;
         this.userId = userId;
     }
 
-    public MedalCompositeKey() {
+    public UserAndPostCompositeKey() {
     }
 
     public Long getPostId() {
@@ -39,7 +42,7 @@ public class MedalCompositeKey implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MedalCompositeKey that = (MedalCompositeKey) o;
+        UserAndPostCompositeKey that = (UserAndPostCompositeKey) o;
         return Objects.equals(postId, that.postId) && Objects.equals(userId, that.userId);
     }
 
@@ -50,7 +53,7 @@ public class MedalCompositeKey implements Serializable {
 
     @Override
     public String toString() {
-        return "MedalCompositeKey{" +
+        return "UserAndPostCompositeKey{" +
                 "postId=" + postId +
                 ", userId=" + userId +
                 '}';

@@ -125,6 +125,13 @@ public class UserController {
     }
 
 
+    @GetMapping("/getSavedPosts")
+    ResponseEntity<?> getSavedPostByLoggedInUser(@RequestHeader("Authorization") Optional<String> jwt)
+    {
+        return null;
+    }
+
+
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO)
             throws ResourceNotFoundException, UnauthorizedException {
@@ -142,9 +149,10 @@ public class UserController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteUser()
+    public ResponseEntity<?> deleteUser(@RequestHeader("Authorization") Optional<String> jwt)
             throws ResourceNotFoundException, UnauthorizedException {
 
+        if(jwt.isEmpty()) throw new UnauthorizedException(USER_NOT_FOUND_MSG);
         User user= GeneralQueryRepository.getByID(
                 userRepository,
                 GeneralQueryRepository.getCurrentlyLoggedInUserId(),

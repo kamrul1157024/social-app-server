@@ -37,7 +37,7 @@ class VerificationsTest {
 
     }
 
-    private void testPoliticalPost(String politicalText,String nonPoliticalText) throws VerificationException
+    private void testPoliticalPost(String politicalText,String nonPoliticalText)
     {
         Post post=new Post();
         post.setPostText(politicalText);

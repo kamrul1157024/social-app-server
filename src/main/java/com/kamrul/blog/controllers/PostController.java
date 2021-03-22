@@ -4,7 +4,7 @@ import com.kamrul.blog.dto.MedalDTO;
 import com.kamrul.blog.dto.PostDTO;
 import com.kamrul.blog.exception.ResourceNotFoundException;
 import com.kamrul.blog.exception.UnauthorizedException;
-import com.kamrul.blog.models.medal.MedalCompositeKey;
+import com.kamrul.blog.models.compositeKey.UserAndPostCompositeKey;
 import com.kamrul.blog.models.medal.MedalType;
 import com.kamrul.blog.models.post.Post;
 import com.kamrul.blog.models.user.User;
@@ -63,8 +63,8 @@ public class PostController {
         if(jwtOptional.isEmpty() || !jwtOptional.get().startsWith("Bearer")) return new ResponseEntity<>(postDTO,HttpStatus.OK);
 
         Long loggedInUserId=JWTUtil.getUserIdFromJwt(jwtOptional.get());
-        MedalCompositeKey medalCompositeKey= new MedalCompositeKey(loggedInUserId,postId);
-        Optional<MedalDTO> medal= medalRepository.findMedalByCompositeKey(medalCompositeKey);
+        UserAndPostCompositeKey userAndPostCompositeKey = new UserAndPostCompositeKey(loggedInUserId,postId);
+        Optional<MedalDTO> medal= medalRepository.findMedalByCompositeKey(userAndPostCompositeKey);
         MedalType medalGivenByLoggedInUser= medal.isPresent()? medal.get().getMedalType() : MedalType.NO_MEDAL;
         postDTO.setMedalTypeProvidedByLoggedInUser(medalGivenByLoggedInUser);
         return new ResponseEntity<>(postDTO,HttpStatus.OK);

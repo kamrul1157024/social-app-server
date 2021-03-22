@@ -21,7 +21,6 @@ public class PostDTO {
     private Long totalGold;
     private List<Tag> tags;
     private MedalType medalTypeProvidedByLoggedInUser;
-
     public PostDTO(
             Long postId,
             String postText,

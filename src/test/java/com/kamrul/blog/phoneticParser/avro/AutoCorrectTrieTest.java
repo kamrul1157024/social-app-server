@@ -35,13 +35,13 @@ class AutoCorrectTrieTest {
     @Test
     void trieReplacementChecking()
     {
-        assertEquals("erOplen",trie.getReplacement("aeroplane"));
+        assertEquals("erOplen ",trie.getReplacement("aeroplane"));
     }
 
     @Test
     void trieReplacementCheckingWithUnmatchedSuffix()
     {
-        assertEquals("erOplenke",trie.getReplacement("aeroplaneke"));
+        assertEquals("erOplen ke",trie.getReplacement("aeroplaneke"));
     }
 
 }

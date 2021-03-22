@@ -4,8 +4,8 @@ import com.kamrul.blog.dto.PostDTO;
 import com.kamrul.blog.dto.MedalDTO;
 import com.kamrul.blog.exception.ResourceNotFoundException;
 import com.kamrul.blog.exception.UnauthorizedException;
+import com.kamrul.blog.models.compositeKey.UserAndPostCompositeKey;
 import com.kamrul.blog.models.medal.Medal;
-import com.kamrul.blog.models.medal.MedalCompositeKey;
 import com.kamrul.blog.models.medal.MedalType;
 import com.kamrul.blog.models.post.Post;
 import com.kamrul.blog.models.user.User;
@@ -61,14 +61,14 @@ public class MedalController {
                 USER_NOT_FOUND_MSG
         );
 
-        MedalCompositeKey medalCompositeKey= new MedalCompositeKey(userId,postId);
+        UserAndPostCompositeKey userAndPostCompositeKey = new UserAndPostCompositeKey(userId,postId);
 
-        Optional<MedalDTO> optionalMedal= medalRepository.findMedalByCompositeKey(medalCompositeKey);
+        Optional<MedalDTO> optionalMedal= medalRepository.findMedalByCompositeKey(userAndPostCompositeKey);
 
         /* Required SQL Query Optimization */
         if(!optionalMedal.isPresent())
         {
-            Medal medal =new Medal(medalCompositeKey,user, post, userProvidedMedalType);
+            Medal medal =new Medal(userAndPostCompositeKey,user, post, userProvidedMedalType);
             post.addMedalCount(userProvidedMedalType);
             medalRepository.save(medal);
         }
@@ -76,8 +76,8 @@ public class MedalController {
         {
             /* Need to Perform Indexing on (userId,postId) */
             MedalDTO previousMedalDto=optionalMedal.get();
-            Medal previousMedal= new Medal(medalCompositeKey,user,post,previousMedalDto.getMedalType());
-            Medal updatedMedal=new Medal(medalCompositeKey,user,post,userProvidedMedalType);
+            Medal previousMedal= new Medal(userAndPostCompositeKey,user,post,previousMedalDto.getMedalType());
+            Medal updatedMedal=new Medal(userAndPostCompositeKey,user,post,userProvidedMedalType);
             post.removePreviousMedalCount(previousMedalDto.getMedalType());
             post.addMedalCount(userProvidedMedalType);
             if(userProvidedMedalType==MedalType.NO_MEDAL)

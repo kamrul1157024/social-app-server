@@ -1,7 +1,9 @@
 package com.kamrul.blog.models.post;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kamrul.blog.configuration.Verifiable;
+import com.kamrul.blog.models.savedPost.SavedPost;
 import com.kamrul.blog.models.tag.Tag;
 import com.kamrul.blog.models.user.User;
 import com.kamrul.blog.models.comment.Comment;
@@ -11,6 +13,7 @@ import com.kamrul.blog.models.medal.MedalType;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "post")
@@ -61,12 +64,18 @@ public class Post implements Verifiable {
     private Long totalGold;
 
 
-    @ManyToMany(cascade =CascadeType.MERGE,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<SavedPost> savedPosts;
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "post_tags",
             joinColumns = {@JoinColumn(name = "post_id")},
             inverseJoinColumns =  {@JoinColumn(name = "tag_id")}
     )
     private List<Tag> tags;
+
+
 
     private void init()
     {
@@ -193,5 +202,13 @@ public class Post implements Verifiable {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public Set<SavedPost> getSavedPosts() {
+        return savedPosts;
+    }
+
+    public void setSavedPosts(Set<SavedPost> savedPosts) {
+        this.savedPosts = savedPosts;
     }
 }

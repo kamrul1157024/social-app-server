@@ -38,7 +38,7 @@ class PhoneticParserTest {
     @Test
     void phoneParserAutoWithAutoCorrectTest()
     {
-        assertEquals("আমি আইফোন কিনব ",
+        assertEquals("আমি আইফোন  কিনব",
                 phoneticParser.parseBangla("Ami iphone Kinbo",true));
 
         assertEquals("আম পাতা জরা জরা মারব চাবুক চরব ঘোড়া ",
