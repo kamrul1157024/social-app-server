@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.kamrul.blog.models.booklet.Booklet;
 import com.kamrul.blog.models.comment.Comment;
 import com.kamrul.blog.models.comment.CommentReply;
+import com.kamrul.blog.models.group.Community;
 import com.kamrul.blog.models.medal.Medal;
 import com.kamrul.blog.models.post.Post;
 import com.kamrul.blog.models.savedPost.SavedPost;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -14,6 +16,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+@EqualsAndHashCode
+@Data
 @Entity
 @Table(
         name = "user_info",
@@ -52,6 +56,7 @@ public class User implements Comparable<User> {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @JsonBackReference("password")
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -82,22 +87,28 @@ public class User implements Comparable<User> {
     @Column(name = "user_description",columnDefinition = "Text")
     private String userDescription;
 
+    @JsonBackReference("user_posts")
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Post> posts;
 
+    @JsonBackReference("comments")
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Comment> comments;
 
+    @JsonBackReference("comment_replies")
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<CommentReply> commentReplies;
 
+    @JsonBackReference("user_medal")
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Medal> medals;
 
+    @JsonBackReference("user_booklet")
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Booklet> booklets;
 
 
+    @JsonBackReference("followedBy")
     @ManyToMany
     @JoinTable(
             name = "follow",
@@ -106,6 +117,7 @@ public class User implements Comparable<User> {
     )
     private Set<User> followedBy;
 
+    @JsonBackReference("followed")
     @ManyToMany
     @JoinTable(
             name = "follow",
@@ -115,9 +127,13 @@ public class User implements Comparable<User> {
     private Set<User> followed;
 
 
+    @JsonBackReference
     @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
     private Set<SavedPost> savedPosts;
 
+    @OneToMany(mappedBy = "owner",fetch = FetchType.LAZY)
+    @JsonBackReference("communities")
+    private Set<Community> communities;
 
     private void init()
     {
@@ -127,7 +143,12 @@ public class User implements Comparable<User> {
         this.totalNumberOfUserFollowed=0L;
     }
 
-    public User(String userName, String firstName, String lastName, String email, String password,Date dateOfBirth) {
+    public User(String userName,
+                String firstName,
+                String lastName,
+                String email,
+                String password,
+                Date dateOfBirth) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -145,100 +166,6 @@ public class User implements Comparable<User> {
     }
 
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @JsonBackReference("password")
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
-
-    @JsonBackReference("user_posts")
-    public List<Post> getPosts() {
-        return posts;
-    }
-
-
-    public void setPosts(List<Post> posts) {
-        this.posts = posts;
-    }
-
-    @JsonBackReference("comments")
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
-    @JsonBackReference("comment_replies")
-    public List<CommentReply> getCommentReplies() {
-        return commentReplies;
-    }
-
-    public void setCommentReplies(List<CommentReply> commentReplies) {
-        this.commentReplies = commentReplies;
-    }
-
-    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
     public Boolean getEmailVerified() {
         return isEmailVerified;
     }
@@ -254,114 +181,6 @@ public class User implements Comparable<User> {
     public void setEmailVisible(Boolean emailVisible) {
         isEmailVisible = emailVisible;
     }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    @JsonBackReference("followed")
-    public Set<User> getFollowed() {
-        return followed;
-    }
-
-    public void setFollowed(Set<User> followed) {
-        this.followed = followed;
-    }
-
-    @JsonBackReference("followedBy")
-    public Set<User> getFollowedBy() {
-        return followedBy;
-    }
-
-    public void setFollowedBy(Set<User> followedBy) {
-        this.followedBy = followedBy;
-    }
-
-    public Long getTotalNumberOfFollower() {
-        return totalNumberOfFollower;
-    }
-
-    public void setTotalNumberOfFollower(Long totalNumberOfFollower) {
-        this.totalNumberOfFollower = totalNumberOfFollower;
-    }
-
-    public Long getTotalNumberOfUserFollowed() {
-        return totalNumberOfUserFollowed;
-    }
-
-    public void setTotalNumberOfUserFollowed(Long totalNumberOfUserFollowed) {
-        this.totalNumberOfUserFollowed = totalNumberOfUserFollowed;
-    }
-
-    public String getUserDescription() {
-        return userDescription;
-    }
-
-    public void setUserDescription(String userDescription) {
-        this.userDescription = userDescription;
-    }
-
-    @JsonBackReference("user_medal")
-    public List<Medal> getMedals() {
-        return medals;
-    }
-
-    public void setMedals(List<Medal> medals) {
-        this.medals = medals;
-    }
-
-
-    @JsonBackReference("user_booklet")
-    public List<Booklet> getBooklets() {
-        return booklets;
-    }
-
-    public void setBooklets(List<Booklet> booklets) {
-        this.booklets = booklets;
-    }
-
-    @JsonBackReference
-    public Set<SavedPost> getSavedPosts() {
-        return savedPosts;
-    }
-
-    public void setSavedPosts(Set<SavedPost> savedPosts) {
-        this.savedPosts = savedPosts;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(userId, user.userId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(userId, userName, profilePicture, firstName, lastName, email, city, country, gender, totalNumberOfFollower);
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
 
 
     @Override

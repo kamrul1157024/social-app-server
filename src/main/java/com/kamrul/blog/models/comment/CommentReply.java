@@ -3,10 +3,12 @@ package com.kamrul.blog.models.comment;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.kamrul.blog.configuration.Verifiable;
 import com.kamrul.blog.models.user.User;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
 
+@Data
 @Entity
 @Table(name = "comment_reply")
 public class CommentReply implements Verifiable {
@@ -31,6 +33,7 @@ public class CommentReply implements Verifiable {
     @Column(name = "comment_reply_text",nullable = false,columnDefinition = "TEXT")
     private String commentReplyText;
 
+    @JsonBackReference("comment_reply_comment")
     @ManyToOne
     @JoinColumn(name = "comment_id")
     private Comment comment;
@@ -62,44 +65,4 @@ public class CommentReply implements Verifiable {
         init();
     }
 
-    public Long getCommentReplyId() {
-        return commentReplyId;
-    }
-
-    public void setCommentReplyId(Long commentReplyId) {
-        this.commentReplyId = commentReplyId;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public String getCommentReplyText() {
-        return commentReplyText;
-    }
-
-    public void setCommentReplyText(String commentReplyText) {
-        this.commentReplyText = commentReplyText;
-    }
-
-    @JsonBackReference("comment_reply_comment")
-    public Comment getComment() {
-        return comment;
-    }
-
-    public void setComment(Comment comment) {
-        this.comment = comment;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 }

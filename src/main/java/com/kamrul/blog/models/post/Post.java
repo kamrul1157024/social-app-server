@@ -9,12 +9,15 @@ import com.kamrul.blog.models.user.User;
 import com.kamrul.blog.models.comment.Comment;
 import com.kamrul.blog.models.medal.Medal;
 import com.kamrul.blog.models.medal.MedalType;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+@EqualsAndHashCode
+@Data
 @Entity
 @Table(name = "post")
 public class Post implements Verifiable {
@@ -46,15 +49,6 @@ public class Post implements Verifiable {
     @Column(name = "is_draft",nullable = false)
     private boolean isDraft;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id",nullable = false)
-    private User user;
-
-    @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
-    private List<Comment> comments;
-
-    @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
-    private List<Medal> medals;
 
     @Column(name = "total_bronze")
     private Long totalBronze;
@@ -63,6 +57,16 @@ public class Post implements Verifiable {
     @Column(name = "total_gold")
     private Long totalGold;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id",nullable = false)
+    private User user;
+
+    @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
+    private List<Comment> comments;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
+    private List<Medal> medals;
 
     @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
     @JsonIgnore
@@ -111,83 +115,6 @@ public class Post implements Verifiable {
         if(previousMedalType==MedalType.GOLD) this.totalGold--;
     }
 
-    public Long getPostId() {
-        return postId;
-    }
-
-    public void setPostId(Long postId) {
-        this.postId = postId;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public String getPostTitle() {
-        return postTitle;
-    }
-
-    public void setPostTitle(String postTitle) {
-        this.postTitle = postTitle;
-    }
-
-    public String getPostText() {
-        return postText;
-    }
-
-    public void setPostText(String postText) {
-        this.postText = postText;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
-    @JsonBackReference
-    public List<Medal> getMedals() {
-        return medals;
-    }
-
-    public void setMedals(List<Medal> medals) {
-        this.medals = medals;
-    }
-
-    public Long getTotalBronze() {
-        return totalBronze;
-    }
-
-    public void setTotalBronze(Long totalBronze) {
-        this.totalBronze = totalBronze;
-    }
-
-    public Long getTotalSilver() {
-        return totalSilver;
-    }
-
-    public void setTotalSilver(Long totalSiver) {
-        this.totalSilver = totalSiver;
-    }
-
-    public Long getTotalGold() {
-        return totalGold;
-    }
-
-    public void setTotalGold(Long totalGold) {
-        this.totalGold = totalGold;
-    }
-
     public boolean isDraft() {
         return isDraft;
     }
@@ -196,19 +123,4 @@ public class Post implements Verifiable {
         isDraft = draft;
     }
 
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public Set<SavedPost> getSavedPosts() {
-        return savedPosts;
-    }
-
-    public void setSavedPosts(Set<SavedPost> savedPosts) {
-        this.savedPosts = savedPosts;
-    }
 }

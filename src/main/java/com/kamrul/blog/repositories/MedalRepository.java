@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface MedalRepository extends JpaRepository<Medal, UserAndPostCompositeKey> {
 
-    @Query(value = "SELECT new com.kamrul.blog.dto.MedalDTO(m.user.userId,m.post.postId,m.medalType) FROM  Medal m WHERE m.id=:userAndPostCompositeKey")
+    @Query(value = "SELECT new com.kamrul.blog.dto.MedalDTO(m.user.userId,m.post.postId,m.medalType) FROM  Medal m WHERE m.userAndPostCompositeKey=:userAndPostCompositeKey")
     Optional<MedalDTO> findMedalByCompositeKey(@Param("userAndPostCompositeKey") UserAndPostCompositeKey userAndPostCompositeKey);
 
     @Query(value = "SELECT new com.kamrul.blog.dto.MedalDTO(m.user.userId,m.post.postId,m.medalType) FROM Medal m JOIN m.post WHERE m.user.userId=:loggedInUserId")

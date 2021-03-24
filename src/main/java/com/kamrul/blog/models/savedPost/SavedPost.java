@@ -8,25 +8,24 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "saved_post_by_user")
-@Data
-@EqualsAndHashCode
 public class SavedPost {
 
 
     @EmbeddedId
     UserAndPostCompositeKey userAndPostCompositeKey;
 
+    @MapsId("userId")
     @ManyToOne
-    @MapsId("user_id")
-    @JoinColumn(name = "user_id")
+    @JoinColumn
     private User user;
 
+    @MapsId("postId")
     @ManyToOne
-    @MapsId("post_id")
-    @JoinColumn(name = "post_id")
+    @JoinColumn
     private Post post;
 
 
@@ -34,11 +33,62 @@ public class SavedPost {
     @Column(name = "creation_time",nullable = false)
     private Date creationTime;
 
-    public SavedPost(User user, Post post) {
+
+    public SavedPost(UserAndPostCompositeKey userAndPostCompositeKey,User user, Post post) {
+        this.user=user;
+        this.post=post;
+        this.userAndPostCompositeKey=userAndPostCompositeKey;
         creationTime=new Date();
     }
 
     public SavedPost() {
         creationTime=new Date();
+    }
+
+
+
+    public UserAndPostCompositeKey getUserAndPostCompositeKey() {
+        return userAndPostCompositeKey;
+    }
+
+    public void setUserAndPostCompositeKey(UserAndPostCompositeKey userAndPostCompositeKey) {
+        this.userAndPostCompositeKey = userAndPostCompositeKey;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
+    public Date getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(Date creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SavedPost savedPost = (SavedPost) o;
+        return getUserAndPostCompositeKey().equals(savedPost.getUserAndPostCompositeKey()) && getUser().equals(savedPost.getUser()) && getPost().equals(savedPost.getPost()) && getCreationTime().equals(savedPost.getCreationTime());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUserAndPostCompositeKey(), getUser(), getPost(), getCreationTime());
     }
 }

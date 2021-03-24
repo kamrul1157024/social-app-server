@@ -16,4 +16,5 @@ public interface SavedPostRepository extends
     List<Post> getSavedPostByUserId(@Param("userId")Long userId);
 
 
+
 }

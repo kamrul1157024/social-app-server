@@ -19,14 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
-
 import static com.kamrul.blog.utils.GeneralResponseMSG.*;
 
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/saveBook")
+@RequestMapping("/api/savePost")
 public class SavePostController {
 
     @Autowired
@@ -36,9 +36,32 @@ public class SavePostController {
     @Autowired
     private UserRepository userRepository;
 
+    @GetMapping("/isSavedByLoggedInUser")
+    ResponseEntity<?> isSavedByLoggedInUser(
+            @RequestParam("postId") Long postId,
+            @RequestHeader("Authorization") Optional<String> jwt)
+            throws UnauthorizedException {
+
+        SavedPostDTO savedPostDTO=new SavedPostDTO(postId,false);
+
+        if (jwt.isEmpty()) return ResponseEntity.ok(savedPostDTO);
+        Long userId=JWTUtil.getUserIdFromJwt(jwt.get());
+
+        Optional<SavedPost> savedPost=
+                savedPostRepository
+                        .findById(new UserAndPostCompositeKey(userId, postId));
+        savedPostDTO.setSavedByLoggedInUser(savedPost.isEmpty());
+
+        return ResponseEntity.ok(savedPost);
+    }
+
+
     @PutMapping
-    ResponseEntity<?> saveToTheBooklet(@RequestBody SavedPostDTO savedPostDTO,
-                                                         @RequestHeader("Authorization")Optional<String> jwt) throws UnauthorizedException, ResourceNotFoundException {
+    @Transactional(rollbackOn = {Exception.class})
+    ResponseEntity<?> saveThisPost(
+            @RequestBody SavedPostDTO savedPostDTO,
+            @RequestHeader("Authorization")Optional<String> jwt)
+            throws UnauthorizedException, ResourceNotFoundException {
 
         if(jwt.isEmpty())
             throw new UnauthorizedException("Not logged In!");
@@ -58,22 +81,22 @@ public class SavePostController {
                 POST_NOT_FOUND_MSG
         );
 
-
         UserAndPostCompositeKey userAndPostCompositeKey=new UserAndPostCompositeKey(userId,postId);
 
         Optional<SavedPost> savedPost=savedPostRepository.findById(userAndPostCompositeKey);
 
         if(savedPost.isEmpty())
         {
-            SavedPost newSavedPost= new SavedPost(user,post);
+            SavedPost newSavedPost= new SavedPost(userAndPostCompositeKey,user,post);
             savedPostRepository.save(newSavedPost);
+            return ResponseEntity.ok(new Message("Post Saved!"));
         }
         else
         {
             savedPostRepository.deleteById(userAndPostCompositeKey);
+            return ResponseEntity.ok(new Message("Post removed!"));
         }
 
-        return ResponseEntity.ok(new Message("Post Saved!"));
     }
 
 

@@ -34,6 +34,8 @@ public class UserController {
     private MedalRepository medalRepository;
     @Autowired
     private BookletRepository bookletRepository;
+    @Autowired
+    private SavedPostRepository savedPostRepository;
 
     @GetMapping("/details")
     public ResponseEntity<?> getUserDetails(@RequestParam(value = "id") Long userId)
@@ -126,9 +128,11 @@ public class UserController {
 
 
     @GetMapping("/getSavedPosts")
-    ResponseEntity<?> getSavedPostByLoggedInUser(@RequestHeader("Authorization") Optional<String> jwt)
-    {
-        return null;
+    ResponseEntity<?> getSavedPostByLoggedInUser(@RequestHeader("Authorization") Optional<String> jwt) throws UnauthorizedException {
+        if(jwt.isEmpty()) new UnauthorizedException("LogIn first!");
+        Long userId=JWTUtil.getUserIdFromJwt(jwt.get());
+        List<Post> savedPost=savedPostRepository.getSavedPostByUserId(userId);
+        return new ResponseEntity<>(savedPost,HttpStatus.OK);
     }
 
 

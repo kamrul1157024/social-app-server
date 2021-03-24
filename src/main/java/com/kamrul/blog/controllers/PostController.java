@@ -60,13 +60,21 @@ public class PostController {
         PostDTO postDTO=new PostDTO();
         postDTO= Converters.convert(post,postDTO);
 
-        if(jwtOptional.isEmpty() || !jwtOptional.get().startsWith("Bearer")) return new ResponseEntity<>(postDTO,HttpStatus.OK);
+        if(jwtOptional.isEmpty() || !jwtOptional.get().startsWith("Bearer"))
+            return new ResponseEntity<>(postDTO,HttpStatus.OK);
 
         Long loggedInUserId=JWTUtil.getUserIdFromJwt(jwtOptional.get());
-        UserAndPostCompositeKey userAndPostCompositeKey = new UserAndPostCompositeKey(loggedInUserId,postId);
-        Optional<MedalDTO> medal= medalRepository.findMedalByCompositeKey(userAndPostCompositeKey);
-        MedalType medalGivenByLoggedInUser= medal.isPresent()? medal.get().getMedalType() : MedalType.NO_MEDAL;
+        UserAndPostCompositeKey userAndPostCompositeKey =
+                new UserAndPostCompositeKey(loggedInUserId,postId);
+
+        Optional<MedalDTO> medal= medalRepository
+                .findMedalByCompositeKey(userAndPostCompositeKey);
+
+        MedalType medalGivenByLoggedInUser=
+                medal.isPresent()? medal.get().getMedalType() : MedalType.NO_MEDAL;
+
         postDTO.setMedalTypeProvidedByLoggedInUser(medalGivenByLoggedInUser);
+
         return new ResponseEntity<>(postDTO,HttpStatus.OK);
     }
 

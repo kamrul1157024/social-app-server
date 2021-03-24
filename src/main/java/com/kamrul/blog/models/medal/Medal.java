@@ -4,31 +4,37 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.kamrul.blog.models.compositeKey.UserAndPostCompositeKey;
 import com.kamrul.blog.models.post.Post;
 import com.kamrul.blog.models.user.User;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Objects;
 
+@Data
+@EqualsAndHashCode
 @Entity
 @Table(name = "medal")
 public class Medal {
 
     @EmbeddedId
-    UserAndPostCompositeKey id;
+    UserAndPostCompositeKey userAndPostCompositeKey;
+
+    @JsonBackReference("medal_user")
     @MapsId("userId")
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn
     private User user;
 
+    @JsonBackReference("medal_post")
     @MapsId("postId")
     @ManyToOne
-    @JoinColumn(name = "post_id")
+    @JoinColumn
     private Post post;
 
     @Column(name = "medal_type")
     MedalType medalType;
 
-    public Medal(UserAndPostCompositeKey id, User user, Post post, MedalType medalType) {
-        this.id = id;
+    public Medal(UserAndPostCompositeKey userAndPostCompositeKey, User user, Post post, MedalType medalType) {
+        this.userAndPostCompositeKey = userAndPostCompositeKey;
         this.user = user;
         this.post = post;
         this.medalType = medalType;
@@ -38,50 +44,4 @@ public class Medal {
     public Medal() {
     }
 
-    public UserAndPostCompositeKey getId() {
-        return id;
-    }
-
-    public void setId(UserAndPostCompositeKey id) {
-        this.id = id;
-    }
-
-    @JsonBackReference("medal_user")
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    @JsonBackReference("medal_post")
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
-
-    public MedalType getMedalType() {
-        return medalType;
-    }
-
-    public void setMedalType(MedalType medalType) {
-        this.medalType = medalType;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Medal medal = (Medal) o;
-        return getId().equals(medal.getId()) && getUser().equals(medal.getUser()) && getPost().equals(medal.getPost()) && getMedalType() == medal.getMedalType();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getUser(), getPost(), getMedalType());
-    }
 }
