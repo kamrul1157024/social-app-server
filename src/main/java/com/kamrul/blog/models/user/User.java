@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.kamrul.blog.models.booklet.Booklet;
 import com.kamrul.blog.models.comment.Comment;
 import com.kamrul.blog.models.comment.CommentReply;
-import com.kamrul.blog.models.group.Community;
+import com.kamrul.blog.models.community.Community;
 import com.kamrul.blog.models.medal.Medal;
 import com.kamrul.blog.models.post.Post;
 import com.kamrul.blog.models.savedPost.SavedPost;
@@ -13,7 +13,6 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @EqualsAndHashCode

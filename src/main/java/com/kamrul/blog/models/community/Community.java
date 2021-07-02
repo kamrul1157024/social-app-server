@@ -1,4 +1,4 @@
-package com.kamrul.blog.models.group;
+package com.kamrul.blog.models.community;
 
 import com.kamrul.blog.models.user.User;
 import lombok.*;
