@@ -11,7 +11,6 @@ import java.util.List;
 
 @Data
 public class PostDTO {
-
     private Long postId;
     private String postText;
     private String postTitle;
@@ -56,5 +55,4 @@ public class PostDTO {
     public void setDraft(Boolean draft) {
         isDraft = draft;
     }
-
 }

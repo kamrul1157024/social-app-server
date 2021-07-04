@@ -14,5 +14,4 @@ public class CommentReplyDTO {
         this.commentReplyId = commentReplyId;
         this.commentReplyText = commentText;
     }
-
 }

@@ -28,9 +28,6 @@ public class UserDTO {
     private Long totalNumberOfUserFollowed;
     private String userDescription;
 
-    public UserDTO(){}
-
-
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth=dateOfBirth;
     }
@@ -50,7 +47,6 @@ public class UserDTO {
     public void setEmailVerified(Boolean emailVerified) {
         isEmailVerified = emailVerified;
     }
-
 
     public Boolean getFollowedByCurrentlyLoggedInUser() {
         return isFollowedByCurrentlyLoggedInUser;

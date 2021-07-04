@@ -60,20 +60,13 @@ public class AuthenticationService {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO)
     {
-
         System.out.println(userDTO);
-
         User user=new User();
         user= Converters.convert(userDTO,user);
-
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-
-
         userRepository.save(user);
-
         UserDTO userOutDTO=new UserDTO();
         userOutDTO= Converters.convert(user,userOutDTO);
-
         return new ResponseEntity<>(userOutDTO,HttpStatus.ACCEPTED);
     }
 

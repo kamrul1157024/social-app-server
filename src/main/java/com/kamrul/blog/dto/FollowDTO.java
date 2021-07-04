@@ -5,5 +5,4 @@ import lombok.*;
 @Data
 public class FollowDTO {
  private Long follow;
-
 }

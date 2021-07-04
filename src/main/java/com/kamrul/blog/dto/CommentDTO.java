@@ -13,5 +13,4 @@ public class CommentDTO {
         this.commentId = commentId;
         this.commentText = commentText;
     }
-
 }
