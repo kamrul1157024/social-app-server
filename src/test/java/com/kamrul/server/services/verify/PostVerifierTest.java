@@ -17,7 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 
-@ActiveProfiles("test")
+@ActiveProfiles("verifier_service_test")
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 class PostVerifierTest {

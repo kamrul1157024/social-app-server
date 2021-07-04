@@ -2,7 +2,6 @@ package com.kamrul.server.services.verify;
 
 import com.github.javafaker.Faker;
 import com.kamrul.server.dto.CommentDTO;
-import com.kamrul.server.dto.PostDTO;
 import com.kamrul.server.politicalPostFilter.FilterPost;
 import com.kamrul.server.politicalPostFilter.models.TextAnalyzingResponse;
 import com.kamrul.server.services.draftJS.DraftJSTextParsing;
@@ -18,7 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 
-@ActiveProfiles("test")
+@ActiveProfiles("verifier_service_test")
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 class CommentVerifierTest {
