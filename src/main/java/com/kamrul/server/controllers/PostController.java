@@ -115,7 +115,7 @@ public class PostController {
     public ResponseEntity<?> createPost(
             @RequestBody PostDTO postDTO,
             @RequestHeader("Authorization") String jwt)
-            throws ResourceNotFoundException, UnauthorizedException, VerificationException {
+            throws ResourceNotFoundException, UnauthorizedException, VerificationException,StackOverflowError {
         Long loggedInUserId= JWTUtil.getUserIdFromJwt(jwt);
         User user= GeneralQueryRepository.getByID(
                 userRepository,
