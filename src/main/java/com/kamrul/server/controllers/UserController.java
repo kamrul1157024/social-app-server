@@ -155,14 +155,13 @@ public class UserController {
     @DeleteMapping
     public ResponseEntity<?> deleteUser(@RequestHeader("Authorization") Optional<String> jwt)
             throws ResourceNotFoundException, UnauthorizedException {
-
         if(jwt.isEmpty()) throw new UnauthorizedException(USER_NOT_FOUND_MSG);
         User user= GeneralQueryRepository.getByID(
                 userRepository,
                 GeneralQueryRepository.getCurrentlyLoggedInUserId(),
                 USER_NOT_FOUND_MSG);
-
-        userRepository.deleteInBatch(Arrays.asList(user));
+        user.setDeleted(true);
+        userRepository.save(user);
         return new ResponseEntity<>(new Message("User deleted"),HttpStatus.OK);
     }
 

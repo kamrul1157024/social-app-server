@@ -49,7 +49,6 @@ public class Post {
     @Column(name = "is_draft",nullable = false)
     private boolean isDraft;
 
-
     @Column(name = "total_bronze")
     private Long totalBronze;
     @Column(name = "total_silver")

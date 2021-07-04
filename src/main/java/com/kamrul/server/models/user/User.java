@@ -86,8 +86,11 @@ public class User implements Comparable<User> {
     @Column(name = "user_description",columnDefinition = "Text")
     private String userDescription;
 
+    @Column(name = "deleted")
+    private Boolean deleted = false;
+
     @JsonBackReference("user_posts")
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     private List<Post> posts;
 
     @JsonBackReference("comments")
@@ -134,53 +137,29 @@ public class User implements Comparable<User> {
     @JsonBackReference("communities")
     private Set<Community> communities;
 
-    private void init()
-    {
+    private void init() {
         this.isEmailVisible=false;
         this.isEmailVerified=false;
         this.totalNumberOfFollower=0L;
         this.totalNumberOfUserFollowed=0L;
     }
 
-    public User(String userName,
-                String firstName,
-                String lastName,
-                String email,
-                String password,
-                Date dateOfBirth) {
+    public User(String userName, String firstName, String lastName, String email, String password, Date dateOfBirth) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.dateOfBirth=dateOfBirth;
-
-        init();
-
-    }
-
-    public User() {
-
         init();
     }
 
+    public User() { init(); }
 
-    public Boolean getEmailVerified() {
-        return isEmailVerified;
-    }
-
-    public void setEmailVerified(Boolean emailVerified) {
-        isEmailVerified = emailVerified;
-    }
-
-    public Boolean getEmailVisible() {
-        return isEmailVisible;
-    }
-
-    public void setEmailVisible(Boolean emailVisible) {
-        isEmailVisible = emailVisible;
-    }
-
+    public Boolean getEmailVerified() { return isEmailVerified; }
+    public void setEmailVerified(Boolean emailVerified) { isEmailVerified = emailVerified; }
+    public Boolean getEmailVisible() { return isEmailVisible; }
+    public void setEmailVisible(Boolean emailVisible) { isEmailVisible = emailVisible; }
 
     @Override
     public int compareTo(User o) {
