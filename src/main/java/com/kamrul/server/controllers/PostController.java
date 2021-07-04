@@ -41,7 +41,7 @@ public class PostController {
     @Autowired
     private MedalRepository medalRepository;
     @Autowired
-    private Verifier<Post> postVerifier;
+    private Verifier<PostDTO> postVerifier;
 
 
     @GetMapping
@@ -116,7 +116,6 @@ public class PostController {
             @RequestBody PostDTO postDTO,
             @RequestHeader("Authorization") String jwt)
             throws ResourceNotFoundException, UnauthorizedException, VerificationException {
-
         Long loggedInUserId= JWTUtil.getUserIdFromJwt(jwt);
         User user= GeneralQueryRepository.getByID(
                 userRepository,
@@ -124,18 +123,16 @@ public class PostController {
                 USER_NOT_FOUND_MSG
         );
         postDTO.setUser(user);
+        postVerifier.verify(postDTO);
         Post post=new Post();
         post=Converters.convert(postDTO,post);
-
-        postVerifier.verify(post);
-
         postRepository.save(post);
         return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
     }
 
     @PutMapping
     @Transactional(rollbackOn = {Exception.class})
-    public ResponseEntity<?> updatePost(@RequestBody PostDTO postDetails)
+    public ResponseEntity<?> updatePost(@RequestBody PostDTO postDTO)
             throws ResourceNotFoundException, UnauthorizedException, VerificationException {
 
         User user= GeneralQueryRepository.getByID(
@@ -145,16 +142,13 @@ public class PostController {
         );
         Post post= GeneralQueryRepository.getByID(
                 postRepository,
-                postDetails.getPostId(),
+                postDTO.getPostId(),
                 POST_NOT_FOUND_MSG
         );
         if(!user.equals(post.getUser()))
             throw new UnauthorizedException("User Do no have permission to Update this post");
-
-        post=Converters.convert(postDetails,post);
-
-        postVerifier.verify(post);
-
+        postVerifier.verify(postDTO);
+        post=Converters.convert(postDTO,post);
         postRepository.save(post);
         return new ResponseEntity<>(post,HttpStatus.OK);
     }
@@ -163,22 +157,11 @@ public class PostController {
     @DeleteMapping
     public ResponseEntity<?> deletePost(@RequestParam(value = "id") Long postId)
             throws ResourceNotFoundException, UnauthorizedException {
-        User user= GeneralQueryRepository.getByID(
-                userRepository,
-                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
-                USER_NOT_FOUND_MSG
-        );
-        Post post= GeneralQueryRepository.getByID(
-                postRepository,
-                postId,
-                POST_NOT_FOUND_MSG
-        );
-
+        User user= GeneralQueryRepository.getByID(userRepository, GeneralQueryRepository.getCurrentlyLoggedInUserId(), USER_NOT_FOUND_MSG);
+        Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND_MSG);
         if(!user.equals(post.getUser()))
             throw new UnauthorizedException("User Do no have permission to delete this post");
-
         postRepository.deleteInBatch(Arrays.asList(post));
-
         return new ResponseEntity<>(new Message("Post Deleted Successfully"),HttpStatus.OK);
     }
 

@@ -1,16 +1,13 @@
 package com.kamrul.server.dto;
 
+import com.kamrul.server.services.verify.Verifiable;
 import lombok.*;
 
 @Data
-public class CommentDTO {
+@AllArgsConstructor
+@NoArgsConstructor
+public class CommentDTO implements Verifiable {
     private Long postId;
     private Long commentId;
     private String commentText;
-
-    public CommentDTO(Long postId, Long commentId, String commentText) {
-        this.postId = postId;
-        this.commentId = commentId;
-        this.commentText = commentText;
-    }
 }

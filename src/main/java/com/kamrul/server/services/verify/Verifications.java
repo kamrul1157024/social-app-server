@@ -7,19 +7,11 @@ import com.kamrul.server.services.verify.exception.PoliticalPostException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class Verifications{
-
     @Autowired
     private FilterPost filterPost;
 
-    public void verifyForPoliticalPost(String text) throws PoliticalPostException
-    {
-        DraftJSTextParsing draftJSPostText= new DraftJSTextParsing(text);
-
-        String postText= draftJSPostText.getAllText();
-        TextAnalyzingResponse textAnalyzingResponse=
-                filterPost.isPoliticalStatement(postText);
-        if (textAnalyzingResponse.getProbabilityOfBeingPolitical()>=.5)
-            throw new PoliticalPostException();
+    public void verifyForPoliticalPost(String text) throws PoliticalPostException {
+        TextAnalyzingResponse textAnalyzingResponse= filterPost.isPoliticalStatement(text);
+        if (textAnalyzingResponse.getProbabilityOfBeingPolitical()>=.5) throw new PoliticalPostException();
     }
-
 }

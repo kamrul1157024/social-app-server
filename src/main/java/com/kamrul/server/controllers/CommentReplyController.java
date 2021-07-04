@@ -33,7 +33,7 @@ public class CommentReplyController {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    Verifier<CommentReply> commentReplyVerifier;
+    Verifier<CommentReplyDTO> commentReplyVerifier;
 
     @GetMapping
     public ResponseEntity<?> getCommentReplyById(@RequestParam(value = "id") Long commentReplyId)
@@ -77,7 +77,7 @@ public class CommentReplyController {
         commentReply.setComment(comment);
         commentReply.setUser(user);
 
-        commentReplyVerifier.verify(commentReply);
+        commentReplyVerifier.verify(commentReplyDTO);
 
         commentReplyRepository.save(commentReply);
 
@@ -106,7 +106,7 @@ public class CommentReplyController {
 
         commentReply.setCommentReplyText(commentReplyDTO.getCommentReplyText());
 
-        commentReplyVerifier.verify(commentReply);
+        commentReplyVerifier.verify(commentReplyDTO);
         commentReplyRepository.save(commentReply);
 
         return new ResponseEntity<>(commentReply,HttpStatus.OK);

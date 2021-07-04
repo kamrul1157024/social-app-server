@@ -2,7 +2,7 @@ package com.kamrul.server.models.post;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kamrul.server.configuration.Verifiable;
+import com.kamrul.server.services.verify.Verifiable;
 import com.kamrul.server.models.savedPost.SavedPost;
 import com.kamrul.server.models.tag.Tag;
 import com.kamrul.server.models.user.User;
@@ -20,7 +20,7 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "post")
-public class Post implements Verifiable {
+public class Post {
 
 
     @Id

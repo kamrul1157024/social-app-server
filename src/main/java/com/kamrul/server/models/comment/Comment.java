@@ -1,7 +1,7 @@
 package com.kamrul.server.models.comment;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.kamrul.server.configuration.Verifiable;
+import com.kamrul.server.services.verify.Verifiable;
 import com.kamrul.server.models.post.Post;
 import com.kamrul.server.models.user.User;
 import lombok.*;
@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "comments")
-public class Comment implements Verifiable {
+public class Comment {
 
     @Id
     @SequenceGenerator(
