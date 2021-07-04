@@ -14,16 +14,11 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class FilterPost {
-
     @Value("${text-analyzer-server}")
     private String textAnalyzingServerURL;
 
-
-
-    public LanguageProbability detectLanguage(String text)
-    {
+    public LanguageProbability detectLanguage(String text) {
         String languageDetectionURL=textAnalyzingServerURL+"/detectLanguage/";
-
         RestTemplate restTemplate=new RestTemplate();
         HttpHeaders httpHeaders= new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);

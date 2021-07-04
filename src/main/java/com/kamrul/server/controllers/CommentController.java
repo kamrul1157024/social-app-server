@@ -37,7 +37,7 @@ public class CommentController {
     @Autowired
     PostRepository postRepository;
     @Autowired
-    Verifier<Comment> commentVerifier;
+    Verifier<CommentDTO> commentVerifier;
 
 
     @GetMapping
@@ -80,7 +80,7 @@ public class CommentController {
         comment.setUser(user);
         comment.setPost(post);
 
-        commentVerifier.verify(comment);
+        commentVerifier.verify(commentDTO);
 
         commentRepository.save(comment);
 
@@ -90,7 +90,7 @@ public class CommentController {
     @PutMapping
     @Transactional(rollbackOn = {Exception.class})
     public ResponseEntity<?> updateComment(@RequestBody CommentDTO commentDTO)
-            throws ResourceNotFoundException, UnauthorizedException {
+            throws ResourceNotFoundException, UnauthorizedException, VerificationException {
 
         User user= GeneralQueryRepository.getByID(
                 userRepository,
@@ -107,7 +107,7 @@ public class CommentController {
 
         if(!user.equals(comment.getUser()))
             throw new UnauthorizedException("User Do no have permission to update this post");
-
+        commentVerifier.verify(commentDTO);
         comment.setCommentText(commentDTO.getCommentText());
         commentRepository.save(comment);
 
