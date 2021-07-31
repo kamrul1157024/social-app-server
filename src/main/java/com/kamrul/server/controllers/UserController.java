@@ -37,15 +37,18 @@ public class UserController {
     @Autowired
     private SavedPostRepository savedPostRepository;
 
+    private Boolean isUserDeleted(User user){
+        System.out.println(user);
+        return (user.getDeleted()==null || user.getDeleted()==true);
+    }
+
     @GetMapping("/details")
     public ResponseEntity<?> getUserDetails(@RequestParam(value = "id") Long userId)
             throws ResourceNotFoundException {
-
         User user= GeneralQueryRepository.getByID(userRepository,userId,USER_NOT_FOUND_MSG);
-
+        if(this.isUserDeleted(user)) throw new ResourceNotFoundException(USER_NOT_FOUND_MSG);
         UserDTO userDTO=new UserDTO();
         userDTO=Converters.convert(user,userDTO);
-
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
 
@@ -53,7 +56,7 @@ public class UserController {
     public ResponseEntity<?> getUserDetailsByUserName(@PathVariable("userName") String userName)
             throws ResourceNotFoundException {
         Optional<User> user=userRepository.findByUserName(userName);
-        if(user.isEmpty()) throw new ResourceNotFoundException(USER_NOT_FOUND_MSG);
+        if(user.isEmpty() || (!user.isEmpty() && this.isUserDeleted(user.get()))) throw new ResourceNotFoundException(USER_NOT_FOUND_MSG);
         UserDTO userDTO=Converters.convert(user.get(),new UserDTO());
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }

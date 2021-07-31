@@ -25,6 +25,7 @@ public class UserDTO {
     private Boolean isFollowedByCurrentlyLoggedInUser;
     private Long totalNumberOfUserFollowed;
     private String userDescription;
+    private Boolean deleted;
 
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth=dateOfBirth;
