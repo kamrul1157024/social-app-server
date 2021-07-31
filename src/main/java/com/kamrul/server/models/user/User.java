@@ -129,13 +129,20 @@ public class User implements Comparable<User> {
     private Set<User> followed;
 
 
-    @JsonBackReference
+    @JsonBackReference("savedPost")
     @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
     private Set<SavedPost> savedPosts;
 
     @OneToMany(mappedBy = "owner",fetch = FetchType.LAZY)
     @JsonBackReference("communities")
-    private Set<Community> communities;
+    private Set<Community> ownedCommunities;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "community_members",
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns =  {@JoinColumn(name = "community_id")}
+    )
+    private Set<Community> memberOfCommunities;
 
     private void init() {
         this.isEmailVisible=false;

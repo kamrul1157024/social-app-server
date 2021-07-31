@@ -2,7 +2,7 @@ package com.kamrul.server.models.post;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kamrul.server.services.verify.Verifiable;
+import com.kamrul.server.models.community.Community;
 import com.kamrul.server.models.savedPost.SavedPost;
 import com.kamrul.server.models.tag.Tag;
 import com.kamrul.server.models.user.User;
@@ -21,8 +21,6 @@ import java.util.Set;
 @Entity
 @Table(name = "post")
 public class Post {
-
-
     @Id
     @SequenceGenerator(
             name = "post_id_generator",
@@ -78,10 +76,11 @@ public class Post {
     )
     private List<Tag> tags;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "community_id",referencedColumnName = "community_id")
+    private Community community;
 
-
-    private void init()
-    {
+    private void init() {
         this.creationDate =new Date();
         this.isDraft=false;
         this.totalBronze=0L;

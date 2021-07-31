@@ -1,10 +1,13 @@
 package com.kamrul.server.models.community;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.kamrul.server.models.post.Post;
 import com.kamrul.server.models.user.User;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode
@@ -12,7 +15,6 @@ import java.util.Date;
 @Entity
 @Table(name = "community")
 public class Community {
-
     @Id
     @SequenceGenerator(
             name = "community_id_generator",
@@ -32,7 +34,8 @@ public class Community {
     private String communityDescription;
     @Column(name = "admin_approval_for_post")
     private Boolean adminApprovalForPost=false;
-
+    @Column(name = "archived", columnDefinition = "boolean default false")
+    private Boolean archived;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "creation_date",nullable = false)
     private Date creationDate=new Date();
@@ -41,4 +44,15 @@ public class Community {
     @JoinColumn(name = "user_id",nullable = false,referencedColumnName = "user_id")
     private User owner;
 
+    @JsonBackReference("communityMembers")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "community_members",
+            joinColumns = {@JoinColumn(name = "community_id")},
+            inverseJoinColumns =  {@JoinColumn(name = "user_id")}
+    )
+    private Set<User> members;
+
+    @JsonBackReference("communityPosts")
+    @OneToMany(mappedBy = "community",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private Set<Post> posts;
 }
