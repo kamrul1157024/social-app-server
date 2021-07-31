@@ -77,16 +77,17 @@ public class User implements Comparable<User> {
 
     @Column(name = "gender",nullable = false)
     private String gender;
-    @Column(name = "total_number_of_follower",nullable = false)
+
+    @Column(name = "total_number_of_follower",nullable = false,columnDefinition = "long default 0")
     private Long totalNumberOfFollower;
 
-    @Column(name = "total_number_of_user_followed",nullable = false)
+    @Column(name = "total_number_of_user_followed",nullable = false, columnDefinition = "long default 0")
     private Long totalNumberOfUserFollowed;
 
     @Column(name = "user_description",columnDefinition = "Text")
     private String userDescription;
 
-    @Column(name = "deleted")
+    @Column(name = "deleted" , columnDefinition = "boolean default false")
     private Boolean deleted = false;
 
     @JsonBackReference("user_posts")

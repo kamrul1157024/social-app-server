@@ -31,6 +31,7 @@ public class Converters {
         userDTO.setTotalNumberOfFollower(user.getTotalNumberOfFollower());
         userDTO.setTotalNumberOfUserFollowed(user.getTotalNumberOfUserFollowed());
         userDTO.setUserDescription(user.getUserDescription());
+        userDTO.setDeleted(user.getDeleted());
         return userDTO;
     }
 
