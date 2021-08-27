@@ -26,7 +26,6 @@ import java.util.Set;
         }
 )
 public class User implements Comparable<User> {
-
     @Id
     @SequenceGenerator(
             name = "user_id_generator",
@@ -143,6 +142,13 @@ public class User implements Comparable<User> {
             inverseJoinColumns =  {@JoinColumn(name = "community_id")}
     )
     private Set<Community> memberOfCommunities;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "community_admins",
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns =  {@JoinColumn(name = "community_id")}
+    )
+    private Set<Community> adminOfCommunities;
 
     private void init() {
         this.isEmailVisible=false;

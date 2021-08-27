@@ -52,6 +52,13 @@ public class Community {
     )
     private Set<User> members;
 
+    @JsonBackReference("communityAdmins")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "community_admins",
+            joinColumns = {@JoinColumn(name = "community_id")},
+            inverseJoinColumns =  {@JoinColumn(name = "user_id")}
+    )
+    private Set<User> admins;
     @JsonBackReference("communityPosts")
     @OneToMany(mappedBy = "community",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private Set<Post> posts;
