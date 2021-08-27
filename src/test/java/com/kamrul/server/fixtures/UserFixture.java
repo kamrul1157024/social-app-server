@@ -1,8 +1,9 @@
-package com.kamrul.server;
+package com.kamrul.server.fixtures;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
+import com.kamrul.server.Config;
 import com.kamrul.server.dto.UserDTO;
 import com.kamrul.server.security.models.AuthenticationRequest;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -12,9 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.Date;
-
-public class Utils {
+public class UserFixture {
     private static Faker faker= new Faker();
     public static String asJsonString(final Object object) throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(object);
@@ -64,7 +63,7 @@ public class Utils {
         userDTO.setUserDescription(faker.harryPotter().book());
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/auth/register")
-                .content(addField(asJsonString(userDTO),"password",String.format("\"%s\"",Config.User.password)))
+                .content(addField(asJsonString(userDTO),"password",String.format("\"%s\"", Config.User.password)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
     }

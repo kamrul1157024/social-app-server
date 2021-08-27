@@ -1,7 +1,7 @@
 package com.kamrul.server.repositories;
 
 import com.github.javafaker.Faker;
-import com.kamrul.server.Utils;
+import com.kamrul.server.fixtures.UserFixture;
 import com.kamrul.server.models.user.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +23,7 @@ class UserRepositoryTest {
     @Test
     void findByUserName() {
         User user = new User();
-        String userName = Utils.getRandomString();
+        String userName = UserFixture.getRandomString();
         user.setUserName(userName);
         user.setPassword("14Adfnf#dajkf");
         user.setEmail(String.format("%s@test.com",userName));

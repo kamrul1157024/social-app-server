@@ -2,7 +2,7 @@ package com.kamrul.server.security.services;
 
 import com.github.javafaker.Faker;
 import com.kamrul.server.Config;
-import com.kamrul.server.Utils;
+import com.kamrul.server.fixtures.UserFixture;
 import com.kamrul.server.dto.UserDTO;
 import com.kamrul.server.security.models.AuthenticationRequest;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -31,13 +31,13 @@ class AuthenticationServiceTest {
     void setUp() throws Exception {
         Faker faker = new Faker();
         userNameAndPassword = new ImmutablePair<>(faker.name().username(),Config.User.password);
-        Utils.loginOrRegister(mockMvc,userNameAndPassword);
+        UserFixture.loginOrRegister(mockMvc,userNameAndPassword);
     }
 
     @Test
     void shouldRegisterUserProperly() throws Exception {
-        String randomUserName = Utils.getRandomString();
-        String randomEmail =  Utils.getRandomString()+"@test.com";
+        String randomUserName = UserFixture.getRandomString();
+        String randomEmail =  UserFixture.getRandomString()+"@test.com";
         UserDTO userDTO =  new UserDTO();
         userDTO.setUserName(randomUserName);
         userDTO.setEmail(randomEmail);
@@ -53,7 +53,7 @@ class AuthenticationServiceTest {
         userDTO.setUserDescription("test_description");
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/auth/register")
-                .content(Utils.addField(Utils.asJsonString(userDTO),"password","\"test123\""))
+                .content(UserFixture.addField(UserFixture.asJsonString(userDTO),"password","\"test123\""))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.userName").value(randomUserName))
@@ -73,7 +73,7 @@ class AuthenticationServiceTest {
         authenticationRequest.setPassword(userNameAndPassword.getRight());
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/auth/authenticate")
-                .content(Utils.asJsonString(authenticationRequest))
+                .content(UserFixture.asJsonString(authenticationRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.jwt").exists())
