@@ -1,17 +1,24 @@
 package com.kamrul.server;
 
+import com.github.javafaker.Faker;
+import lombok.Getter;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+@Getter
 public class MockRequest {
     private final MockMvc mockMvc;
     private final String jwt;
+    private final  ImmutablePair<String,String> userNameAndPassword;
 
     public MockRequest(MockMvc mockMvc) throws Exception {
+        Faker faker = new Faker();
         this.mockMvc = mockMvc;
-        this.jwt = Utils.loginOrRegister(mockMvc);
+        userNameAndPassword = new ImmutablePair<>(faker.name().username()+Utils.getRandomString(),Config.User.password);
+        this.jwt = Utils.loginOrRegister(mockMvc,userNameAndPassword);
     }
 
     public ResultActions get(String url) throws Exception {

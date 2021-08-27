@@ -27,20 +27,20 @@ class UserControllerTest {
 
     private void matchToLoggedInUser(ResultActions response) throws Exception{
         response.andExpect(status().isOk())
-                .andExpect(jsonPath("$.userName").value(Config.User.userName))
-                .andExpect(jsonPath("$.email").value(Config.User.email))
-                .andExpect(jsonPath("$.city").value("test_city"))
-                .andExpect(jsonPath("$.country").value("test_country"))
-                .andExpect(jsonPath("$.gender").value("test_gender"))
-                .andExpect(jsonPath("$.firstName").value("test_firstname"))
-                .andExpect(jsonPath("$.lastName").value("test_lastname"))
-                .andExpect(jsonPath("$.userDescription").value("test_description"));
+                .andExpect(jsonPath("$.userName").value(mockRequest.getUserNameAndPassword().getLeft()))
+                .andExpect(jsonPath("$.email").isString())
+                .andExpect(jsonPath("$.city").isString())
+                .andExpect(jsonPath("$.country").isString())
+                .andExpect(jsonPath("$.gender").isString())
+                .andExpect(jsonPath("$.firstName").isString())
+                .andExpect(jsonPath("$.lastName").isString())
+                .andExpect(jsonPath("$.userDescription").isString());
     }
 
     @Test
     @Order(1)
     void shouldGetUserUsingUserName() throws Exception{
-        matchToLoggedInUser(mockRequest.get(String.format("/api/user/%s", Config.User.userName)));
+        matchToLoggedInUser(mockRequest.get(String.format("/api/user/%s", mockRequest.getUserNameAndPassword().getLeft())));
     }
 
     @Test
