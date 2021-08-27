@@ -44,9 +44,9 @@ public class PostController {
     private Verifier<PostDTO> postVerifier;
 
 
-    @GetMapping
+    @GetMapping("/{id}")
     public ResponseEntity<?> getPostById(
-            @RequestParam(value = "id") Long postId ,
+            @PathVariable(value = "id") Long postId ,
             @RequestHeader("Authorization") Optional<String> jwtOptional
     )
             throws ResourceNotFoundException, UnauthorizedException {
@@ -126,7 +126,7 @@ public class PostController {
         postVerifier.verify(postDTO);
         Post post=new Post();
         post=Converters.convert(postDTO,post);
-        postRepository.save(post);
+        post = postRepository.save(post);
         return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
     }
 
@@ -154,8 +154,8 @@ public class PostController {
     }
 
 
-    @DeleteMapping
-    public ResponseEntity<?> deletePost(@RequestParam(value = "id") Long postId)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePost(@PathVariable(value = "id") Long postId)
             throws ResourceNotFoundException, UnauthorizedException {
         User user= GeneralQueryRepository.getByID(userRepository, GeneralQueryRepository.getCurrentlyLoggedInUserId(), USER_NOT_FOUND_MSG);
         Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND_MSG);
