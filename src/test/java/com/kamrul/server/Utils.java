@@ -2,8 +2,10 @@ package com.kamrul.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.javafaker.Faker;
 import com.kamrul.server.dto.UserDTO;
 import com.kamrul.server.security.models.AuthenticationRequest;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
@@ -13,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.Date;
 
 public class Utils {
+    private static Faker faker= new Faker();
     public static String asJsonString(final Object object) throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(object);
     }
@@ -25,10 +28,12 @@ public class Utils {
         return "test"+Math.random()*100000000;
     }
 
-    public static String login(MockMvc mockMvc) throws Exception{
+    public static String login(MockMvc mockMvc,ImmutablePair<String,String> usernameAndPassword) throws Exception{
         AuthenticationRequest authenticationRequest = new AuthenticationRequest();
-        authenticationRequest.setUserName(Config.User.userName);
-        authenticationRequest.setPassword(Config.User.password);
+        String userName = usernameAndPassword.getLeft();
+        String password = usernameAndPassword.getRight();
+        authenticationRequest.setUserName(userName);
+        authenticationRequest.setPassword(password);
         JSONObject loginResponse = new JSONObject(
                 mockMvc.perform(MockMvcRequestBuilders
                         .post("/auth/authenticate")
@@ -36,23 +41,27 @@ public class Utils {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse().getContentAsString());
+        System.out.println(loginResponse);
         return loginResponse.getString("jwt");
     }
 
-    public static void register(MockMvc mockMvc) throws Exception{
-        UserDTO userDTO =  new UserDTO();
-        userDTO.setUserName(Config.User.userName);
-        userDTO.setEmail(Config.User.email);
-        userDTO.setPassword("test242%24jj@");
-        userDTO.setCity("test_city");
-        userDTO.setCountry("test_country");
+    public static void register(MockMvc mockMvc,ImmutablePair<String,String> userNameAndPassword) throws Exception{
+        String userName = userNameAndPassword.getLeft();
+        String password = userNameAndPassword.getRight();
+        String email = String.format("%s@gmail.com",userName);
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUserName(userName);
+        userDTO.setEmail(email);
+        userDTO.setPassword(password);
+        userDTO.setCity(faker.address().cityName());
+        userDTO.setCountry(faker.address().country());
         userDTO.setEmailVerified(Boolean.FALSE);
-        userDTO.setDateOfBirth(new Date());
+        userDTO.setDateOfBirth(faker.date().birthday());
         userDTO.setEmailVisible(Boolean.TRUE);
-        userDTO.setGender("test_gender");
-        userDTO.setFirstName("test_firstname");
-        userDTO.setLastName("test_lastname");
-        userDTO.setUserDescription("test_description");
+        userDTO.setGender("male");
+        userDTO.setFirstName(faker.name().firstName());
+        userDTO.setLastName(faker.name().lastName());
+        userDTO.setUserDescription(faker.harryPotter().book());
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/auth/register")
                 .content(addField(asJsonString(userDTO),"password",String.format("\"%s\"",Config.User.password)))
@@ -75,8 +84,9 @@ public class Utils {
         }
     }
 
-    public static String loginOrRegister(MockMvc mockMvc) throws Exception{
-        if(!hasUser(Config.User.userName, mockMvc)) register(mockMvc);
-        return login(mockMvc);
+    public static String loginOrRegister(MockMvc mockMvc,ImmutablePair<String,String> userNameAndPassword) throws Exception{
+        String userName = userNameAndPassword.getLeft();
+        if(!hasUser(userName, mockMvc)) register(mockMvc,userNameAndPassword);
+        return login(mockMvc,userNameAndPassword);
     }
 }

@@ -1,9 +1,11 @@
 package com.kamrul.server.security.services;
 
+import com.github.javafaker.Faker;
 import com.kamrul.server.Config;
 import com.kamrul.server.Utils;
 import com.kamrul.server.dto.UserDTO;
 import com.kamrul.server.security.models.AuthenticationRequest;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -24,10 +26,12 @@ class AuthenticationServiceTest {
 
     @Autowired
     private MockMvc mockMvc;
-
+    ImmutablePair<String,String> userNameAndPassword;
     @BeforeAll
     void setUp() throws Exception {
-        Utils.loginOrRegister(mockMvc);
+        Faker faker = new Faker();
+        userNameAndPassword = new ImmutablePair<>(faker.name().username(),Config.User.password);
+        Utils.loginOrRegister(mockMvc,userNameAndPassword);
     }
 
     @Test
@@ -65,8 +69,8 @@ class AuthenticationServiceTest {
     @Test
     void ShouldLogInProperly() throws Exception{
         AuthenticationRequest authenticationRequest = new AuthenticationRequest();
-        authenticationRequest.setUserName(Config.User.userName);
-        authenticationRequest.setPassword(Config.User.password);
+        authenticationRequest.setUserName(userNameAndPassword.getLeft());
+        authenticationRequest.setPassword(userNameAndPassword.getRight());
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/auth/authenticate")
                 .content(Utils.asJsonString(authenticationRequest))
