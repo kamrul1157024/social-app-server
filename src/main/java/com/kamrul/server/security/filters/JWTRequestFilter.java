@@ -28,13 +28,11 @@ public class JWTRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException
-    {
+            throws ServletException, IOException {
         final String authorizationHeader=request.getHeader("Authorization");
         Long userId=null;
         String jwt;
-        if (authorizationHeader!=null && authorizationHeader.startsWith("Bearer "))
-        {
+        if (authorizationHeader!=null && authorizationHeader.startsWith("Bearer ")) {
             jwt=authorizationHeader.substring(7);
             try {
                 userId=jwtUtil.extractUserId(jwt);
@@ -43,21 +41,11 @@ public class JWTRequestFilter extends OncePerRequestFilter {
             }
         }
 
-
-        if(userId!=null && SecurityContextHolder.getContext().getAuthentication()==null)
-        {
+        if(userId!=null && SecurityContextHolder.getContext().getAuthentication()==null) {
             AppUserDetails userDetails=userDetailsService.loadUserByUserId(userId);
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
-                    =new UsernamePasswordAuthenticationToken(
-                    userDetails,null,userDetails.getAuthorities()
-            );
-
-            usernamePasswordAuthenticationToken
-                    .setDetails(
-                            new WebAuthenticationDetailsSource()
-                                    .buildDetails(request)
-                    );
-
+                    =new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
+            usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }
 

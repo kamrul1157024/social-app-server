@@ -18,8 +18,6 @@ public abstract class GeneralQueryRepository {
 
     public static AppUserDetails getCurrentlyLoggedInUser() throws UnauthorizedException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             AppUserDetails userDetails = (AppUserDetails) authentication.getPrincipal();
             return userDetails;
@@ -32,6 +30,4 @@ public abstract class GeneralQueryRepository {
         AppUserDetails appUserDetails= getCurrentlyLoggedInUser();
         return appUserDetails.getUserId();
     }
-
-
 }
