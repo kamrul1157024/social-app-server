@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment,Long> {
 
-    @Query("SELECT new Comment (c.commentId,c.commentText,c.creationDate,c.user)FROM Comment c WHERE  c.post.postId=:postId ORDER BY c.creationDate DESC")
+    @Query("SELECT new Comment (c.commentId,c.commentText,c.creationDate,c.creator)FROM Comment c WHERE  c.post.postId=:postId ORDER BY c.creationDate DESC")
     List<Comment> getCommentsByPostID(@Param("postId") Long postId);
 
 }

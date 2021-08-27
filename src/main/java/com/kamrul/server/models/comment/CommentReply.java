@@ -39,8 +39,8 @@ public class CommentReply {
     private Comment comment;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "user_id",nullable = false,referencedColumnName = "user_id")
+    private User creator;
 
     private void init()
     {
@@ -52,12 +52,12 @@ public class CommentReply {
         init();
     }
 
-    public CommentReply(Long commentReplyId,String commentReplyText,Date creationDate,User user)
+    public CommentReply(Long commentReplyId,String commentReplyText,Date creationDate,User creator)
     {
         this.commentReplyId=commentReplyId;
         this.commentReplyText=commentReplyText;
         this.creationDate=creationDate;
-        this.user=user;
+        this.creator=creator;
     }
 
 

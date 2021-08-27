@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CommentReplyRepository extends JpaRepository<CommentReply,Long> {
 
-    @Query("SELECT new CommentReply (cr.commentReplyId,cr.commentReplyText,cr.creationDate,cr.user) FROM CommentReply cr WHERE cr.comment.commentId=:commentId ORDER BY cr.creationDate")
+    @Query("SELECT new CommentReply (cr.commentReplyId,cr.commentReplyText,cr.creationDate,cr.creator) FROM CommentReply cr WHERE cr.comment.commentId=:commentId ORDER BY cr.creationDate")
     List<CommentReply> getCommentRepliesByCommentId(@Param("commentId") Long commentId);
 
 }

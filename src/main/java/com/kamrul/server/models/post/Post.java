@@ -55,8 +55,8 @@ public class Post {
     private Long totalGold;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id",nullable = false)
-    private User user;
+    @JoinColumn(name = "creator_id",nullable = false,referencedColumnName = "user_id")
+    private User creator;
 
     @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
     private List<Comment> comments;

@@ -41,8 +41,8 @@ public class Comment {
     private Post post;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "creator_id",nullable = false,referencedColumnName = "user_id")
+    private User creator;
 
     @OneToMany(mappedBy = "comment",fetch = FetchType.LAZY)
     private List<CommentReply> commentReplies;
@@ -57,12 +57,12 @@ public class Comment {
         init();
     }
 
-    public  Comment(Long commentId,String commentText,Date creationDate,User user)
+    public  Comment(Long commentId,String commentText,Date creationDate,User creator)
     {
         this.commentId=commentId;
         this.commentText=commentText;
         this.creationDate=creationDate;
-        this.user=user;
+        this.creator=creator;
     }
 
     public Comment() {
