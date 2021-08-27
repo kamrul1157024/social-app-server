@@ -1,7 +1,9 @@
 package com.kamrul.server.utils;
 
+import com.kamrul.server.dto.CommunityDTO;
 import com.kamrul.server.dto.PostDTO;
 import com.kamrul.server.dto.UserDTO;
+import com.kamrul.server.models.community.Community;
 import com.kamrul.server.models.post.Post;
 import com.kamrul.server.models.user.User;
 
@@ -104,4 +106,23 @@ public class Converters {
         return post;
     }
 
+    public static CommunityDTO convert(Community community){
+        CommunityDTO communityDTO = new CommunityDTO();
+        communityDTO.setCommunityId(community.getCommunityId());
+        communityDTO.setCommunityName(community.getCommunityName());
+        communityDTO.setCommunityDescription(community.getCommunityDescription());
+        communityDTO.setCreationDate(community.getCreationDate());
+        communityDTO.setOwner(community.getOwner());
+        return communityDTO;
+    }
+
+    public static Community convert(CommunityDTO communityDTO){
+        Community community = new Community();
+         community.setCommunityId(communityDTO.getCommunityId());
+         community.setCommunityName(communityDTO.getCommunityName());
+         community.setOwner(communityDTO.getOwner());
+         community.setCreationDate(communityDTO.getCreationDate());
+         community.setCommunityDescription(communityDTO.getCommunityDescription());
+         return community;
+    }
 }
