@@ -45,12 +45,8 @@ public class PostController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getPostById(
-            @PathVariable(value = "id") Long postId ,
-            @RequestHeader("Authorization") Optional<String> jwtOptional
-    )
+    public ResponseEntity<?> getPostById(@PathVariable(value = "id") Long postId , @RequestHeader("Authorization") Optional<String> jwtOptional)
             throws ResourceNotFoundException, UnauthorizedException {
-
         Post post= GeneralQueryRepository.getByID(
                 postRepository,
                 postId,
@@ -69,10 +65,8 @@ public class PostController {
 
         Optional<MedalDTO> medal= medalRepository
                 .findMedalByCompositeKey(userAndPostCompositeKey);
-
         MedalType medalGivenByLoggedInUser=
                 medal.isPresent()? medal.get().getMedalType() : MedalType.NO_MEDAL;
-
         postDTO.setMedalTypeProvidedByLoggedInUser(medalGivenByLoggedInUser);
 
         return new ResponseEntity<>(postDTO,HttpStatus.OK);
@@ -112,16 +106,10 @@ public class PostController {
 
     @PostMapping
     @Transactional(rollbackOn = {Exception.class})
-    public ResponseEntity<?> createPost(
-            @RequestBody PostDTO postDTO,
-            @RequestHeader("Authorization") String jwt)
+    public ResponseEntity<?> createPost(@RequestBody PostDTO postDTO, @RequestHeader("Authorization") Optional<String> jwt)
             throws ResourceNotFoundException, UnauthorizedException, VerificationException,StackOverflowError {
-        Long loggedInUserId= JWTUtil.getUserIdFromJwt(jwt);
-        User user= GeneralQueryRepository.getByID(
-                userRepository,
-                loggedInUserId,
-                USER_NOT_FOUND_MSG
-        );
+        Long loggedInUserId= JWTUtil.getUserIdFromJwt(jwt.get());
+        User user= GeneralQueryRepository.getByID(userRepository,loggedInUserId, USER_NOT_FOUND_MSG);
         postDTO.setUser(user);
         postVerifier.verify(postDTO);
         Post post=new Post();
@@ -132,21 +120,13 @@ public class PostController {
 
     @PutMapping
     @Transactional(rollbackOn = {Exception.class})
-    public ResponseEntity<?> updatePost(@RequestBody PostDTO postDTO)
+    public ResponseEntity<?> updatePost(@RequestBody PostDTO postDTO, @RequestHeader("Authorization") Optional<String> jwt)
             throws ResourceNotFoundException, UnauthorizedException, VerificationException {
-
-        User user= GeneralQueryRepository.getByID(
-                userRepository,
-                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
-                USER_NOT_FOUND_MSG
-        );
-        Post post= GeneralQueryRepository.getByID(
-                postRepository,
-                postDTO.getPostId(),
-                POST_NOT_FOUND_MSG
-        );
+        Long loggedInUserId = JWTUtil.getUserIdFromJwt(jwt.get());
+        User user= GeneralQueryRepository.getByID(userRepository,loggedInUserId, USER_NOT_FOUND_MSG);
+        Post post= GeneralQueryRepository.getByID(postRepository, postDTO.getPostId(), POST_NOT_FOUND_MSG);
         if(!user.equals(post.getUser()))
-            throw new UnauthorizedException("User Do no have permission to Update this post");
+            throw new UnauthorizedException("User Do not have permission to Update this post");
         postVerifier.verify(postDTO);
         post=Converters.convert(postDTO,post);
         postRepository.save(post);
@@ -155,15 +135,14 @@ public class PostController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePost(@PathVariable(value = "id") Long postId)
+    public ResponseEntity<?> deletePost(@PathVariable(value = "id") Long postId,@RequestHeader("Authorization") Optional<String> jwt)
             throws ResourceNotFoundException, UnauthorizedException {
-        User user= GeneralQueryRepository.getByID(userRepository, GeneralQueryRepository.getCurrentlyLoggedInUserId(), USER_NOT_FOUND_MSG);
+        Long loggedInUserId = JWTUtil.getUserIdFromJwt(jwt.get());
+        User user= GeneralQueryRepository.getByID(userRepository, loggedInUserId, USER_NOT_FOUND_MSG);
         Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND_MSG);
         if(!user.equals(post.getUser()))
             throw new UnauthorizedException("User Do no have permission to delete this post");
         postRepository.deleteInBatch(Arrays.asList(post));
         return new ResponseEntity<>(new Message("Post Deleted Successfully"),HttpStatus.OK);
     }
-
-
 }
