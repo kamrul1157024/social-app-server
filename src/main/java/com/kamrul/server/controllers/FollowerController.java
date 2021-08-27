@@ -8,9 +8,7 @@ import com.kamrul.server.models.user.User;
 import com.kamrul.server.repositories.FollowerRepository;
 import com.kamrul.server.repositories.GeneralQueryRepository;
 import com.kamrul.server.repositories.UserRepository;
-import com.kamrul.server.security.jwt.JWTUtil;
 import com.kamrul.server.utils.Converters;
-import com.kamrul.server.utils.GeneralResponseMSG;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.transaction.Transactional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import static com.kamrul.server.utils.GeneralResponseMSG.USER_NOT_FOUND_MSG;
 
 @CrossOrigin
 @RestController
@@ -31,19 +30,14 @@ public class FollowerController {
     private FollowerRepository followerRepository;
 
     @GetMapping("/allFollowedUserId")
-    ResponseEntity<?> getAllUserIdLoggedInUserFollows(@RequestHeader("Authorization") String jwt)
-            throws UnauthorizedException {
-
+    ResponseEntity<?> getAllUserIdLoggedInUserFollows(@RequestAttribute("userId") Long loggedInUserId) {
         /*Need to perform SQL Query Optimization*/
-        Long loggedInUserId=JWTUtil.getUserIdFromJwt(jwt);
         Set<User> userFollows = followerRepository.getAllUserCurrentUserFollows(loggedInUserId);
-
         Set<Long> userIds=userFollows
                 .stream()
                 .sorted()
                 .map(user -> user.getUserId())
                 .collect(Collectors.toSet());
-
         return new ResponseEntity<>(userIds,HttpStatus.OK);
     }
 
@@ -54,32 +48,19 @@ public class FollowerController {
 
     @PutMapping
     @Transactional(rollbackOn = {Exception.class})
-    ResponseEntity<?>  followUserById(
-            @RequestBody FollowDTO followDTO,
-            @RequestHeader("Authorization") String jwt)
+    ResponseEntity<?>  followUserById(@RequestBody FollowDTO followDTO, @RequestAttribute("userId") Long loggedInUserId)
             throws UnauthorizedException, ResourceNotFoundException {
-        Long loggedInUserId= JWTUtil.getUserIdFromJwt(jwt);
         Long loggedInUsedWantsToFollowUserId= followDTO.getFollow();
 
-        User loggedInUser= GeneralQueryRepository.getByID(
-                userRepository,
-                loggedInUserId,
-                GeneralResponseMSG.USER_NOT_FOUND_MSG
-                );
-
-        User loggedInUserWantsToFollowUser = GeneralQueryRepository.getByID(
-                userRepository,
-                loggedInUsedWantsToFollowUserId,
-                GeneralResponseMSG.USER_NOT_FOUND_MSG
-        );
+        User loggedInUser= GeneralQueryRepository.getByID(userRepository, loggedInUserId, USER_NOT_FOUND_MSG);
+        User loggedInUserWantsToFollowUser = GeneralQueryRepository.getByID(userRepository, loggedInUsedWantsToFollowUserId, USER_NOT_FOUND_MSG);
 
         /* May required optimization on Saving on Table */
         Set<User> loggedInUserCurrentlyFollowed= loggedInUser.getFollowed();
         Boolean isPreviouslyFollowedByUser= loggedInUserCurrentlyFollowed
                 .stream()
                 .anyMatch(user -> user.getUserId()==loggedInUsedWantsToFollowUserId);
-        if(isPreviouslyFollowedByUser)
-        {
+        if(isPreviouslyFollowedByUser) {
             /* Will get deleted Automatically From follow table */
             loggedInUserCurrentlyFollowed.remove(loggedInUserWantsToFollowUser);
             loggedInUser.setFollowed(loggedInUserCurrentlyFollowed);
@@ -88,15 +69,13 @@ public class FollowerController {
             loggedInUser
                     .setTotalNumberOfUserFollowed(loggedInUser.getTotalNumberOfUserFollowed()-1);
         }
-        else
-        {
+        else {
             loggedInUserCurrentlyFollowed.add(loggedInUserWantsToFollowUser);
             loggedInUser.setFollowed(loggedInUserCurrentlyFollowed);
             loggedInUserWantsToFollowUser
                     .setTotalNumberOfFollower(loggedInUserWantsToFollowUser.getTotalNumberOfFollower()+1);
             loggedInUser
                     .setTotalNumberOfUserFollowed(loggedInUser.getTotalNumberOfUserFollowed()+1);
-
         }
 
         userRepository.save(loggedInUser);
@@ -106,5 +85,4 @@ public class FollowerController {
         loggedInUserDto.setFollowedByCurrentlyLoggedInUser(isPreviouslyFollowedByUser^true);
         return new ResponseEntity<>(loggedInUserDto,HttpStatus.OK);
     }
-
 }

@@ -45,70 +45,48 @@ public class PostController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getPostById(@PathVariable(value = "id") Long postId , @RequestHeader("Authorization") Optional<String> jwtOptional)
-            throws ResourceNotFoundException, UnauthorizedException {
-        Post post= GeneralQueryRepository.getByID(
-                postRepository,
-                postId,
-                POST_NOT_FOUND_MSG
-        );
-
+    public ResponseEntity<?> getPostById(@PathVariable(value = "id") Long postId ,@RequestAttribute("userId") Long loggedInUserId)
+            throws ResourceNotFoundException {
+        Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND_MSG);
         PostDTO postDTO=new PostDTO();
         postDTO= Converters.convert(post,postDTO);
 
-        if(jwtOptional.isEmpty() || !jwtOptional.get().startsWith("Bearer"))
+        if(loggedInUserId==null)
             return new ResponseEntity<>(postDTO,HttpStatus.OK);
 
-        Long loggedInUserId=JWTUtil.getUserIdFromJwt(jwtOptional.get());
-        UserAndPostCompositeKey userAndPostCompositeKey =
-                new UserAndPostCompositeKey(loggedInUserId,postId);
-
-        Optional<MedalDTO> medal= medalRepository
-                .findMedalByCompositeKey(userAndPostCompositeKey);
-        MedalType medalGivenByLoggedInUser=
-                medal.isPresent()? medal.get().getMedalType() : MedalType.NO_MEDAL;
+        UserAndPostCompositeKey userAndPostCompositeKey =  new UserAndPostCompositeKey(loggedInUserId,postId);
+        Optional<MedalDTO> medal= medalRepository.findMedalByCompositeKey(userAndPostCompositeKey);
+        MedalType medalGivenByLoggedInUser= medal.isPresent()? medal.get().getMedalType() : MedalType.NO_MEDAL;
         postDTO.setMedalTypeProvidedByLoggedInUser(medalGivenByLoggedInUser);
-
         return new ResponseEntity<>(postDTO,HttpStatus.OK);
     }
 
     @GetMapping("medalGivers")
     public ResponseEntity<?> getMedalGiversOfThePost(@RequestParam(value = "id")Long postId) throws ResourceNotFoundException {
-        Post post= GeneralQueryRepository.getByID(
-                postRepository,
-                postId,
-                POST_NOT_FOUND_MSG
-        );
+        Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND_MSG);
         return new ResponseEntity<>(post.getMedals(),HttpStatus.OK);
     }
 
     @GetMapping("/page/{pageId}")
-    public ResponseEntity<?> getPostByPage(
-            @PathVariable(value = "pageId") Integer pageId,
-            @RequestHeader("Authorization") Optional<String> jwt) throws UnauthorizedException {
-
-        final Integer pageSize=50;
+    public ResponseEntity<?> getPostByPage(@PathVariable(value = "pageId") Integer pageId, @RequestAttribute("userId") Long loggedInUserId) {
+        final Integer pageSize=500;
         Page<Post> postDTOPage=postRepository.getTopPost(PageRequest.of(pageId-1,pageSize));
         List<PostDTO> postDTOs=new ArrayList<>();
         postDTOPage.forEach(post -> postDTOs.add(Converters.convert(post,new PostDTO())));
+        if(loggedInUserId==null) return new ResponseEntity<>(postDTOs,HttpStatus.OK);
 
-        if(jwt.isEmpty() || !jwt.get().startsWith("Bearer")) return new ResponseEntity<>(postDTOs,HttpStatus.OK);
-        Long loggedInUserId=JWTUtil.getUserIdFromJwt(jwt.get());
-        List<MedalDTO> medalGivenPostIds=medalRepository
-                .getPostForCurrentlyLoggedInUserOnWhichUserGivenMedal(loggedInUserId);
+        List<MedalDTO> medalGivenPostIds=medalRepository.getPostForCurrentlyLoggedInUserOnWhichUserGivenMedal(loggedInUserId);
         //<PostID, MedalType>
         HashMap<Long,MedalType> medalTypeGivenByUser=new HashMap<>();
         medalGivenPostIds.forEach(medalDTO->medalTypeGivenByUser.put(medalDTO.getPostId(), medalDTO.getMedalType()));
         postDTOs.forEach(postDTO->postDTO.setMedalTypeProvidedByLoggedInUser(medalTypeGivenByUser.getOrDefault(postDTO.getPostId(),MedalType.NO_MEDAL)));
-
         return new ResponseEntity<>(postDTOs,HttpStatus.OK);
     }
 
     @PostMapping
     @Transactional(rollbackOn = {Exception.class})
-    public ResponseEntity<?> createPost(@RequestBody PostDTO postDTO, @RequestHeader("Authorization") Optional<String> jwt)
-            throws ResourceNotFoundException, UnauthorizedException, VerificationException,StackOverflowError {
-        Long loggedInUserId= JWTUtil.getUserIdFromJwt(jwt.get());
+    public ResponseEntity<?> createPost(@RequestBody PostDTO postDTO,@RequestAttribute("userId") Long loggedInUserId)
+            throws ResourceNotFoundException, VerificationException,StackOverflowError {
         User user= GeneralQueryRepository.getByID(userRepository,loggedInUserId, USER_NOT_FOUND_MSG);
         postDTO.setUser(user);
         postVerifier.verify(postDTO);
@@ -120,9 +98,8 @@ public class PostController {
 
     @PutMapping
     @Transactional(rollbackOn = {Exception.class})
-    public ResponseEntity<?> updatePost(@RequestBody PostDTO postDTO, @RequestHeader("Authorization") Optional<String> jwt)
+    public ResponseEntity<?> updatePost(@RequestBody PostDTO postDTO, @RequestAttribute("userId") Long loggedInUserId)
             throws ResourceNotFoundException, UnauthorizedException, VerificationException {
-        Long loggedInUserId = JWTUtil.getUserIdFromJwt(jwt.get());
         User user= GeneralQueryRepository.getByID(userRepository,loggedInUserId, USER_NOT_FOUND_MSG);
         Post post= GeneralQueryRepository.getByID(postRepository, postDTO.getPostId(), POST_NOT_FOUND_MSG);
         if(!user.equals(post.getUser()))
@@ -135,9 +112,8 @@ public class PostController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePost(@PathVariable(value = "id") Long postId,@RequestHeader("Authorization") Optional<String> jwt)
+    public ResponseEntity<?> deletePost(@PathVariable(value = "id") Long postId,@RequestAttribute("userId") Long loggedInUserId)
             throws ResourceNotFoundException, UnauthorizedException {
-        Long loggedInUserId = JWTUtil.getUserIdFromJwt(jwt.get());
         User user= GeneralQueryRepository.getByID(userRepository, loggedInUserId, USER_NOT_FOUND_MSG);
         Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND_MSG);
         if(!user.equals(post.getUser()))

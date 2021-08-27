@@ -37,39 +37,23 @@ public class CommentReplyController {
 
     @GetMapping
     public ResponseEntity<?> getCommentReplyById(@RequestParam(value = "id") Long commentReplyId)
-            throws ResourceNotFoundException
-    {
-        CommentReply commentReply= GeneralQueryRepository.getByID(
-                commentReplyRepository,
-                commentReplyId,
-                COMMENT_NOT_FOUND_MSG
-        );
+            throws ResourceNotFoundException {
+        CommentReply commentReply= GeneralQueryRepository.getByID(commentReplyRepository, commentReplyId, COMMENT_NOT_FOUND_MSG);
         return new ResponseEntity<>(commentReply, HttpStatus.OK);
     }
 
     @GetMapping("/comment/{commentId}")
-    public ResponseEntity<?> getCommentReplyByCommentId(@PathVariable(value = "commentId") Long commentID)
-    {
+    public ResponseEntity<?> getCommentReplyByCommentId(@PathVariable(value = "commentId") Long commentID) {
         List<CommentReply> commentReplies=commentReplyRepository.getCommentRepliesByCommentId(commentID);
         return new ResponseEntity<>(commentReplies,HttpStatus.OK);
     }
 
     @PostMapping
     @Transactional(rollbackOn = {Exception.class})
-    public ResponseEntity<?> createCommentReply(@RequestBody CommentReplyDTO commentReplyDTO)
-            throws ResourceNotFoundException, UnauthorizedException, VerificationException {
-
-        User user= GeneralQueryRepository.getByID(
-                userRepository,
-                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
-                USER_NOT_FOUND_MSG
-        );
-
-        Comment comment= GeneralQueryRepository.getByID(
-                commentRepository,
-                commentReplyDTO.getCommentId(),
-                COMMENT_NOT_FOUND_MSG
-        );
+    public ResponseEntity<?> createCommentReply(@RequestBody CommentReplyDTO commentReplyDTO,@RequestAttribute("userId") Long userId)
+            throws ResourceNotFoundException, VerificationException {
+        User user= GeneralQueryRepository.getByID(userRepository,userId, USER_NOT_FOUND_MSG);
+        Comment comment= GeneralQueryRepository.getByID(commentRepository, commentReplyDTO.getCommentId(), COMMENT_NOT_FOUND_MSG);
 
         CommentReply commentReply=new CommentReply();
 
@@ -78,28 +62,16 @@ public class CommentReplyController {
         commentReply.setUser(user);
 
         commentReplyVerifier.verify(commentReplyDTO);
-
         commentReplyRepository.save(commentReply);
-
         return new ResponseEntity<>(commentReply, HttpStatus.ACCEPTED);
     }
 
     @PutMapping
     @Transactional(rollbackOn = {Exception.class})
-    public ResponseEntity<?> updateCommentReply(@RequestBody CommentReplyDTO commentReplyDTO)
+    public ResponseEntity<?> updateCommentReply(@RequestBody CommentReplyDTO commentReplyDTO,@RequestAttribute("userId") Long userId)
             throws ResourceNotFoundException, UnauthorizedException, VerificationException {
-        User user= GeneralQueryRepository.getByID(
-                userRepository,
-                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
-                USER_NOT_FOUND_MSG
-        );
-
-        CommentReply commentReply= GeneralQueryRepository.getByID(
-                commentReplyRepository,
-                commentReplyDTO.getCommentReplyId(),
-                COMMENT_NOT_FOUND_MSG
-        );
-
+        User user= GeneralQueryRepository.getByID(userRepository,userId, USER_NOT_FOUND_MSG);
+        CommentReply commentReply= GeneralQueryRepository.getByID(commentReplyRepository, commentReplyDTO.getCommentReplyId(), COMMENT_NOT_FOUND_MSG);
 
         if(!user.equals(commentReply.getUser()))
             throw new UnauthorizedException("User Do no have permission to Update comment");
@@ -113,20 +85,10 @@ public class CommentReplyController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteCommentReply(@RequestParam(value = "id") Long commentReplyId)
-            throws ResourceNotFoundException, UnauthorizedException
-    {
-        User user= GeneralQueryRepository.getByID(
-                userRepository,
-                GeneralQueryRepository.getCurrentlyLoggedInUserId(),
-                USER_NOT_FOUND_MSG
-        );
-
-        CommentReply commentReply= GeneralQueryRepository.getByID(
-                commentReplyRepository,
-                commentReplyId,
-                COMMENT_NOT_FOUND_MSG
-        );
+    public ResponseEntity<?> deleteCommentReply(@RequestParam(value = "id") Long commentReplyId,@RequestAttribute("userId") Long userId)
+            throws ResourceNotFoundException,UnauthorizedException {
+        User user= GeneralQueryRepository.getByID(userRepository,userId, USER_NOT_FOUND_MSG);
+        CommentReply commentReply= GeneralQueryRepository.getByID(commentReplyRepository, commentReplyId, COMMENT_NOT_FOUND_MSG);
 
         if(!user.equals(commentReply.getUser()))
             throw new UnauthorizedException("User Do no have permission to delete comment");
@@ -134,7 +96,4 @@ public class CommentReplyController {
         commentReplyRepository.deleteInBatch(Arrays.asList(commentReply));
         return new ResponseEntity<>(new Message("Comment Deleted Successfully"),HttpStatus.OK);
     }
-
-
-
 }
