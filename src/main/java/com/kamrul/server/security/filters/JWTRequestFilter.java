@@ -5,6 +5,8 @@ import com.kamrul.server.exception.UnauthorizedException;
 import com.kamrul.server.security.jwt.JWTUtil;
 import com.kamrul.server.security.models.AppUserDetails;
 import com.kamrul.server.security.services.AppUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +28,8 @@ public class JWTRequestFilter extends OncePerRequestFilter {
     @Autowired
     AppUserDetailsService userDetailsService;
 
+    public static final Logger logger = LoggerFactory.getLogger(JWTRequestFilter.class);
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -37,7 +41,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
             try {
                 userId=jwtUtil.extractUserId(jwt);
             } catch (UnauthorizedException unauthorizedException) {
-                unauthorizedException.printStackTrace();
+                logger.error(unauthorizedException.getStackTrace().toString());
             }
         }
 
@@ -48,7 +52,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
             usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }
-
+        request.setAttribute("userId",userId);
         filterChain.doFilter(request,response);
     }
 }

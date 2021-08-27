@@ -40,40 +40,24 @@ public class MedalController {
 
     @PutMapping
     @Transactional(rollbackOn = {Exception.class})
-    ResponseEntity<?> giveMedalOnThePostByUser(
-            @RequestBody MedalDTO medalDataFromUser,
-            @RequestHeader("Authorization") String jwt)
-            throws UnauthorizedException, ResourceNotFoundException {
-
-        Long userId= JWTUtil.getUserIdFromJwt(jwt);
+    ResponseEntity<?> giveMedalOnThePostByUser(@RequestBody MedalDTO medalDataFromUser, @RequestAttribute("userId") Long userId)
+            throws ResourceNotFoundException {
         Long postId= medalDataFromUser.getPostId();
         MedalType userProvidedMedalType=medalDataFromUser.getMedalType();
 
-        Post post=GeneralQueryRepository.getByID(
-                postRepository,
-                medalDataFromUser.getPostId(),
-                POST_NOT_FOUND_MSG
-        );
-
-        User user=GeneralQueryRepository.getByID(
-                userRepository,
-                userId,
-                USER_NOT_FOUND_MSG
-        );
+        Post post=GeneralQueryRepository.getByID(postRepository, medalDataFromUser.getPostId(), POST_NOT_FOUND_MSG);
+        User user=GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND_MSG);
 
         UserAndPostCompositeKey userAndPostCompositeKey = new UserAndPostCompositeKey(userId,postId);
-
         Optional<MedalDTO> optionalMedal= medalRepository.findMedalByCompositeKey(userAndPostCompositeKey);
 
         /* Required SQL Query Optimization */
-        if(!optionalMedal.isPresent())
-        {
+        if(!optionalMedal.isPresent()) {
             Medal medal =new Medal(userAndPostCompositeKey,user, post, userProvidedMedalType);
             post.addMedalCount(userProvidedMedalType);
             medalRepository.save(medal);
         }
-        else
-        {
+        else {
             /* Need to Perform Indexing on (userId,postId) */
             MedalDTO previousMedalDto=optionalMedal.get();
             Medal previousMedal= new Medal(userAndPostCompositeKey,user,post,previousMedalDto.getMedalType());
@@ -84,12 +68,10 @@ public class MedalController {
                 medalRepository.deleteInBatch(Arrays.asList(previousMedal));
             else
                 medalRepository.save(updatedMedal);
-
         }
         PostDTO postDTO=new PostDTO();
         postDTO= Converters.convert(post,postDTO);
         postDTO.setMedalTypeProvidedByLoggedInUser(userProvidedMedalType);
         return new ResponseEntity<>(postDTO, HttpStatus.OK);
     }
-
 }

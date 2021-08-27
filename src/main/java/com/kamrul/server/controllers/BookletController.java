@@ -35,26 +35,18 @@ public class BookletController {
     @GetMapping
     ResponseEntity<?> getBookLetById(@RequestParam("id") Long bookletId)
             throws ResourceNotFoundException {
-        Booklet booklet= GeneralQueryRepository.getByID(
-          bookletRepository,
-          bookletId, BOOKLET_NOT_FOUND_MSG
-        );
+        Booklet booklet= GeneralQueryRepository.getByID(bookletRepository, bookletId, BOOKLET_NOT_FOUND_MSG);
         return new ResponseEntity<>(booklet, HttpStatus.OK);
     }
 
     @PostMapping
     @Transactional(rollbackOn = {Exception.class})
-    ResponseEntity<?> postBooklet(
-            @RequestBody  Booklet booklet,
-            @RequestHeader("Authorization")Optional<String> jwt)
+    ResponseEntity<?> postBooklet(@RequestBody  Booklet booklet, @RequestAttribute("userId")Long loggedInUserId)
             throws UnauthorizedException, ResourceNotFoundException {
-
-        Long loggedInUserId= JWTUtil.getUserIdFromJwt(jwt.get());
         User loggedInUser=GeneralQueryRepository.getByID(
                 userRepository,
                 loggedInUserId,
                 USER_NOT_FOUND_MSG);
-
         Booklet bookletToSaveOnDatabase=new Booklet();
         bookletToSaveOnDatabase.setBookletTitle(booklet.getBookletTitle());
         bookletToSaveOnDatabase.setBookletDescription(booklet.getBookletDescription());
@@ -71,40 +63,22 @@ public class BookletController {
     }
 
     @PutMapping
-    ResponseEntity<?> updateBooklet(
-            @RequestBody Booklet updatedBooklet,
-            @RequestHeader("Authorization") Optional<String> jwt)
-            throws UnauthorizedException, ResourceNotFoundException {
-      Long userId=JWTUtil.getUserIdFromJwt(jwt.get());
-      User user= GeneralQueryRepository.getByID(
-              userRepository,
-              userId,
-              USER_NOT_FOUND_MSG
-      );
+    ResponseEntity<?> updateBooklet(@RequestBody Booklet updatedBooklet, @RequestAttribute("userId")Long userId)
+            throws ResourceNotFoundException {
+      User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND_MSG);
       /* Checking Booklet Exist! */
-      GeneralQueryRepository.getByID(
-              bookletRepository,
-              updatedBooklet.getBookletId(),
-              BOOKLET_NOT_FOUND_MSG
-      );
-
+      GeneralQueryRepository.getByID(bookletRepository, updatedBooklet.getBookletId(), BOOKLET_NOT_FOUND_MSG);
       updatedBooklet.setUser(user);
       bookletRepository.save(updatedBooklet);
-
       return new ResponseEntity<>(updatedBooklet,HttpStatus.OK);
     }
 
+    //need to verify user
     @DeleteMapping
     ResponseEntity<?> deleteBookLetById(@RequestParam("bookletId") Long bookletId)
             throws ResourceNotFoundException {
-        Booklet booklet=GeneralQueryRepository.getByID(
-                bookletRepository,
-                bookletId,
-                BOOKLET_NOT_FOUND_MSG
-        );
+        Booklet booklet=GeneralQueryRepository.getByID(bookletRepository, bookletId, BOOKLET_NOT_FOUND_MSG);
         bookletRepository.deleteInBatch(Arrays.asList(booklet));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
-
-
 }
