@@ -80,7 +80,7 @@ public class PhoneticXmlLoader implements PhoneticLoader {
 
         digester.addSetNext("data/patterns/pattern", "addPattern");
 
-        Data data = (Data) digester.parse(this.url);
+        Data data = digester.parse(this.url);
         return data;
     }
 }

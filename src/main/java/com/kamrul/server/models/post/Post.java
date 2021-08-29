@@ -80,9 +80,9 @@ public class Post {
 
 
 
-    private void init()
-    {
-        this.creationDate =new Date();
+    private void init() {
+        if(this.postId==null)
+            this.creationDate = new Date();
         this.isDraft=false;
         this.totalBronze=0L;
         this.totalSilver=0L;
@@ -114,7 +114,7 @@ public class Post {
         if(previousMedalType==MedalType.GOLD) this.totalGold--;
     }
 
-    public boolean isDraft() {
+    public boolean getDraft() {
         return isDraft;
     }
 
@@ -122,4 +122,17 @@ public class Post {
         isDraft = draft;
     }
 
+    @Override
+    public String toString() {
+        return "Post{" +
+                "postId=" + postId +
+                ", creationDate=" + creationDate +
+                ", postTitle='" + postTitle + '\'' +
+                ", postText='" + postText + '\'' +
+                ", isDraft=" + isDraft +
+                ", totalBronze=" + totalBronze +
+                ", totalSilver=" + totalSilver +
+                ", totalGold=" + totalGold +
+                '}';
+    }
 }

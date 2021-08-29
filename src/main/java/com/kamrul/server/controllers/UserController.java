@@ -1,16 +1,14 @@
 package com.kamrul.server.controllers;
 
-import com.kamrul.server.dto.MedalDTO;
 import com.kamrul.server.dto.PostDTO;
 import com.kamrul.server.dto.UserDTO;
 import com.kamrul.server.exception.ResourceNotFoundException;
-import com.kamrul.server.exception.UnauthorizedException;
 import com.kamrul.server.models.booklet.Booklet;
+import com.kamrul.server.models.medal.Medal;
 import com.kamrul.server.models.medal.MedalType;
 import com.kamrul.server.models.post.Post;
 import com.kamrul.server.models.user.User;
 import com.kamrul.server.repositories.*;
-import com.kamrul.server.security.jwt.JWTUtil;
 import com.kamrul.server.utils.Converters;
 import com.kamrul.server.utils.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import static com.kamrul.server.utils.GeneralResponseMSG.USER_NOT_FOUND_MSG;
 
 @CrossOrigin
@@ -38,26 +38,24 @@ public class UserController {
     private SavedPostRepository savedPostRepository;
 
     private Boolean isUserDeleted(User user){
-        System.out.println(user);
         return (user.getDeleted()==null || user.getDeleted()==true);
     }
 
-    @GetMapping("/details")
-    public ResponseEntity<?> getUserDetails(@RequestParam(value = "id") Long userId)
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getUserDetails(@PathVariable(value = "userId") Long userId)
             throws ResourceNotFoundException {
         User user= GeneralQueryRepository.getByID(userRepository,userId,USER_NOT_FOUND_MSG);
         if(this.isUserDeleted(user)) throw new ResourceNotFoundException(USER_NOT_FOUND_MSG);
-        UserDTO userDTO=new UserDTO();
-        userDTO=Converters.convert(user,userDTO);
+        UserDTO userDTO=Converters.convert(user);
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
 
-    @GetMapping("/{userName}")
+    @GetMapping("/userName/{userName}")
     public ResponseEntity<?> getUserDetailsByUserName(@PathVariable("userName") String userName)
             throws ResourceNotFoundException {
         Optional<User> user=userRepository.findByUserName(userName);
         if(user.isEmpty() || (!user.isEmpty() && this.isUserDeleted(user.get()))) throw new ResourceNotFoundException(USER_NOT_FOUND_MSG);
-        UserDTO userDTO=Converters.convert(user.get(),new UserDTO());
+        UserDTO userDTO=Converters.convert(user.get());
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
 
@@ -67,29 +65,26 @@ public class UserController {
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
-    @GetMapping("/posts")
+    @GetMapping("/{userId}/posts")
     public ResponseEntity<?> getUserPost(
-            @RequestParam(value = "userId") Long userId,
+            @PathVariable(value = "userId") Long userId,
             @RequestParam("pageNo") Integer pageNo,
             @RequestAttribute("userId") Long currentlyLoggedInUserId){
-        final Integer pageSize=40;
-        Page<Post> postDTOPage=postRepository.getPostByUserId(userId, PageRequest.of(pageNo-1,pageSize));
-        List<PostDTO> postDTOS = new ArrayList<>();
-        postDTOPage.forEach(post -> postDTOS.add(Converters.convert(post,new PostDTO())));
-
-        List<MedalDTO> medalGivenPostOfCurrentlyLoggedInUser= medalRepository
-                .getPostIdForUserIdOnWhichCurrentlyLoggedInUserGivenMedal(currentlyLoggedInUserId, userId);
-
-        /*<PostID,NumberOfBahOnPostGivenByUser>*/
-        HashMap<Long, MedalType> medalTypeGivenByLoggedInUser=new HashMap<>();
-        medalGivenPostOfCurrentlyLoggedInUser.forEach((medalDTO)->
-                medalTypeGivenByLoggedInUser
-                        .put(medalDTO.getPostId(), medalDTO.getMedalType()));
-
-        postDTOS.forEach(postDTO ->
-                postDTO.setMedalTypeProvidedByLoggedInUser(medalTypeGivenByLoggedInUser.getOrDefault(postDTO.getPostId(),MedalType.NO_MEDAL))
-        );
-        return new ResponseEntity<>(postDTOS,HttpStatus.OK);
+        final Integer pageSize=500;
+        if(currentlyLoggedInUserId==null){
+            Page<Post> postPage=postRepository.getPostByUserId(userId, PageRequest.of(pageNo-1,pageSize));
+            List<PostDTO> postDTOs = postPage
+                    .stream()
+                    .map(post -> new PostDTO(post)).collect(Collectors.toList());
+            return new ResponseEntity<>(postDTOs,HttpStatus.OK);
+        }
+        Page<PostDTO> postDTOs = postRepository
+                .getPostsByUserIdWithMedalsGivenByLoggedInUser(
+                        userId,
+                        currentlyLoggedInUserId,
+                        PageRequest.of(pageNo-1,pageSize)
+                );
+        return new ResponseEntity<>(postDTOs.toList(),HttpStatus.OK);
     }
 
     @GetMapping("/booklet")
@@ -112,7 +107,7 @@ public class UserController {
             throws ResourceNotFoundException {
         User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND_MSG);
         user=Converters.convert(userDTO,user);
-        userRepository.save(user);
+        user = userRepository.save(user);
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
