@@ -65,8 +65,7 @@ public class AuthenticationService {
         user= Converters.convert(userDTO,user);
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userRepository.save(user);
-        UserDTO userOutDTO=new UserDTO();
-        userOutDTO= Converters.convert(user,userOutDTO);
+        UserDTO userOutDTO= Converters.convert(user);
         return new ResponseEntity<>(userOutDTO,HttpStatus.ACCEPTED);
     }
 

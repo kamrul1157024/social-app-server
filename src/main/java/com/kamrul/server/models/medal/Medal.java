@@ -9,6 +9,8 @@ import lombok.*;
 import javax.persistence.*;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode
 @Entity
 @Table(name = "medal")
@@ -31,16 +33,4 @@ public class Medal {
 
     @Column(name = "medal_type")
     MedalType medalType;
-
-    public Medal(UserAndPostCompositeKey userAndPostCompositeKey, User user, Post post, MedalType medalType) {
-        this.userAndPostCompositeKey = userAndPostCompositeKey;
-        this.user = user;
-        this.post = post;
-        this.medalType = medalType;
-    }
-
-
-    public Medal() {
-    }
-
 }

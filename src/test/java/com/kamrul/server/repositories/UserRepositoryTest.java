@@ -1,20 +1,16 @@
 package com.kamrul.server.repositories;
 
 import com.github.javafaker.Faker;
-import com.kamrul.server.fixtures.UserFixture;
+import com.kamrul.server.MockUserCreator;
 import com.kamrul.server.models.user.User;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@SpringBootTest
 class UserRepositoryTest {
 
     @Autowired
@@ -23,7 +19,7 @@ class UserRepositoryTest {
     @Test
     void findByUserName() {
         User user = new User();
-        String userName = UserFixture.getRandomString();
+        String userName = MockUserCreator.getRandomString();
         user.setUserName(userName);
         user.setPassword("14Adfnf#dajkf");
         user.setEmail(String.format("%s@test.com",userName));

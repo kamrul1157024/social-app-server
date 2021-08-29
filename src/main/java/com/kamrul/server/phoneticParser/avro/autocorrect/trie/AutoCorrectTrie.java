@@ -1,6 +1,7 @@
 package com.kamrul.server.phoneticParser.avro.autocorrect.trie;
 
 import com.kamrul.server.phoneticParser.avro.autocorrect.AutoCorrectLoader;
+import lombok.SneakyThrows;
 import org.json.JSONObject;
 
 import java.util.Iterator;
@@ -12,6 +13,7 @@ public class AutoCorrectTrie {
     private AutoCorrectLoader autoCorrectLoader;
     private static volatile AutoCorrectTrie autoCorrectTrie=null;
 
+    @SneakyThrows
     private void init(AutoCorrectLoader autoCorrectLoader)  {
 
         JSONObject jsonDict=autoCorrectLoader.getJsonDict();

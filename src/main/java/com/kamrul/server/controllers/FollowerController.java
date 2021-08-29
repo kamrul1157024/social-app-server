@@ -81,7 +81,7 @@ public class FollowerController {
         userRepository.save(loggedInUser);
         userRepository.save(loggedInUserWantsToFollowUser);
 
-        UserDTO loggedInUserDto= Converters.convert(loggedInUser,new UserDTO());
+        UserDTO loggedInUserDto= Converters.convert(loggedInUser);
         loggedInUserDto.setFollowedByCurrentlyLoggedInUser(isPreviouslyFollowedByUser^true);
         return new ResponseEntity<>(loggedInUserDto,HttpStatus.OK);
     }

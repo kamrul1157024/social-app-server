@@ -4,6 +4,7 @@ import com.kamrul.server.politicalPostFilter.models.LanguageProbability;
 import com.kamrul.server.politicalPostFilter.models.TextAnalyzingRequest;
 import com.kamrul.server.politicalPostFilter.models.TextAnalyzingResponse;
 import com.kamrul.server.politicalPostFilter.textProccessor.TextProcessor;
+import lombok.SneakyThrows;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -17,6 +18,7 @@ public class FilterPost {
     @Value("${text-analyzer-server}")
     private String textAnalyzingServerURL;
 
+    @SneakyThrows
     public LanguageProbability detectLanguage(String text) {
         String languageDetectionURL=textAnalyzingServerURL+"/detectLanguage/";
         RestTemplate restTemplate=new RestTemplate();

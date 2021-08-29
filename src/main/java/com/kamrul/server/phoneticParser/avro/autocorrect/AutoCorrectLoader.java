@@ -1,5 +1,6 @@
 package com.kamrul.server.phoneticParser.avro.autocorrect;
 
+import lombok.SneakyThrows;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -9,6 +10,7 @@ public class AutoCorrectLoader {
 
     private JSONObject jsonDict;
 
+    @SneakyThrows
     public AutoCorrectLoader()
     {
          InputStream jsonDictInputStream=AutoCorrectLoader.class

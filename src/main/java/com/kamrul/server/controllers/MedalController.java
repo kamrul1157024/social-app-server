@@ -3,7 +3,6 @@ package com.kamrul.server.controllers;
 import com.kamrul.server.dto.PostDTO;
 import com.kamrul.server.dto.MedalDTO;
 import com.kamrul.server.exception.ResourceNotFoundException;
-import com.kamrul.server.exception.UnauthorizedException;
 import com.kamrul.server.models.compositeKey.UserAndPostCompositeKey;
 import com.kamrul.server.models.medal.Medal;
 import com.kamrul.server.models.medal.MedalType;
@@ -13,7 +12,6 @@ import com.kamrul.server.repositories.GeneralQueryRepository;
 import com.kamrul.server.repositories.PostRepository;
 import com.kamrul.server.repositories.MedalRepository;
 import com.kamrul.server.repositories.UserRepository;
-import com.kamrul.server.security.jwt.JWTUtil;
 import com.kamrul.server.utils.Converters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,18 +36,16 @@ public class MedalController {
     @Autowired
     private MedalRepository medalRepository;
 
-    @PutMapping
+    @PutMapping("/post/{postId}")
     @Transactional(rollbackOn = {Exception.class})
-    ResponseEntity<?> giveMedalOnThePostByUser(@RequestBody MedalDTO medalDataFromUser, @RequestAttribute("userId") Long userId)
+    ResponseEntity<?> giveMedalOnThePost(@RequestBody MedalDTO medalDataFromUser, @PathVariable("postId")Long postId, @RequestAttribute("userId") Long userId)
             throws ResourceNotFoundException {
-        Long postId= medalDataFromUser.getPostId();
         MedalType userProvidedMedalType=medalDataFromUser.getMedalType();
-
-        Post post=GeneralQueryRepository.getByID(postRepository, medalDataFromUser.getPostId(), POST_NOT_FOUND_MSG);
+        Post post=GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND_MSG);
         User user=GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND_MSG);
 
         UserAndPostCompositeKey userAndPostCompositeKey = new UserAndPostCompositeKey(userId,postId);
-        Optional<MedalDTO> optionalMedal= medalRepository.findMedalByCompositeKey(userAndPostCompositeKey);
+        Optional<Medal> optionalMedal= medalRepository.findMedalByUserAndPostCompositeKey(userAndPostCompositeKey);
 
         /* Required SQL Query Optimization */
         if(!optionalMedal.isPresent()) {
@@ -59,7 +55,7 @@ public class MedalController {
         }
         else {
             /* Need to Perform Indexing on (userId,postId) */
-            MedalDTO previousMedalDto=optionalMedal.get();
+            Medal previousMedalDto=optionalMedal.get();
             Medal previousMedal= new Medal(userAndPostCompositeKey,user,post,previousMedalDto.getMedalType());
             Medal updatedMedal=new Medal(userAndPostCompositeKey,user,post,userProvidedMedalType);
             post.removePreviousMedalCount(previousMedalDto.getMedalType());
@@ -69,8 +65,7 @@ public class MedalController {
             else
                 medalRepository.save(updatedMedal);
         }
-        PostDTO postDTO=new PostDTO();
-        postDTO= Converters.convert(post,postDTO);
+        PostDTO postDTO= Converters.convert(post);
         postDTO.setMedalTypeProvidedByLoggedInUser(userProvidedMedalType);
         return new ResponseEntity<>(postDTO, HttpStatus.OK);
     }

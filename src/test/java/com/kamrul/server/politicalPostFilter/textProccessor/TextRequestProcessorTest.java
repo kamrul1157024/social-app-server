@@ -24,10 +24,4 @@ class TextRequestProcessorTest {
                 "করোনা সংকটে গত বছরের মে মাসে বেতন কমায় বিমান বাংলাদেশ এয়ারলাইনস এখন তারা বেতনের এই কর্তন ১০ শতাংশ কমিয়ে আনার কথা ভাবছে",
                 TextProcessor.extractBanglaCharacters(text));
     }
-
-    @Test
-    void convertBanglishToPhonetic() throws Exception {
-        String text="iphoner dam onk Taka!";
-        System.out.println(TextProcessor.convertBanglishToPhonetic(text));
-    }
 }

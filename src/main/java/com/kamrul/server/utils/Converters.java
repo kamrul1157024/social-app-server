@@ -9,9 +9,8 @@ import com.kamrul.server.models.user.User;
 public class Converters {
 
 
-    public static UserDTO convert(User user,UserDTO userDTO)
-    {
-
+    public static UserDTO convert(User user) {
+        UserDTO userDTO = new UserDTO();
         userDTO.setUserId(user.getUserId());
         userDTO.setUserName(user.getUserName());
         userDTO.setFirstName(user.getFirstName());
@@ -38,7 +37,6 @@ public class Converters {
 
     public static User convert( UserDTO userDTO,User user)
     {
-
         if(userDTO.getUserName()!=null)
             user.setUserName(userDTO.getUserName());
 
@@ -75,14 +73,14 @@ public class Converters {
         return user;
     }
 
-    public static PostDTO convert(Post post,PostDTO postDTO)
-    {
+    public static PostDTO convert(Post post) {
+        PostDTO postDTO = new PostDTO();
         postDTO.setUser(post.getUser());
         postDTO.setPostId(post.getPostId());
         postDTO.setPostTitle(post.getPostTitle());
         postDTO.setPostText(post.getPostText());
         postDTO.setCreationDate(post.getCreationDate());
-        postDTO.setDraft(post.isDraft());
+        postDTO.setDraft(post.getDraft());
         postDTO.setTotalBronze(post.getTotalBronze());
         postDTO.setTotalSilver(post.getTotalSilver());
         postDTO.setTotalGold(post.getTotalGold());

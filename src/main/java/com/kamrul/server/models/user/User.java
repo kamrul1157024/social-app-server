@@ -78,10 +78,10 @@ public class User implements Comparable<User> {
     @Column(name = "gender",nullable = false)
     private String gender;
 
-    @Column(name = "total_number_of_follower",nullable = false,columnDefinition = "long default 0")
+    @Column(name = "total_number_of_follower",nullable = false,columnDefinition = "int8 default 0")
     private Long totalNumberOfFollower;
 
-    @Column(name = "total_number_of_user_followed",nullable = false, columnDefinition = "long default 0")
+    @Column(name = "total_number_of_user_followed",nullable = false, columnDefinition = "int8 default 0")
     private Long totalNumberOfUserFollowed;
 
     @Column(name = "user_description",columnDefinition = "Text")
@@ -171,7 +171,17 @@ public class User implements Comparable<User> {
     }
 
 
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", userName='" + userName + '\'' +
+                ", email='" + email + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", isEmailVerified=" + isEmailVerified +
+                ", isEmailVisible=" + isEmailVisible +
+                '}';
+    }
 }
 
 

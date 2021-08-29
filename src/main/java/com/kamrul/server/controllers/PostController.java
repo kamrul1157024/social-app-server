@@ -5,6 +5,7 @@ import com.kamrul.server.dto.PostDTO;
 import com.kamrul.server.exception.ResourceNotFoundException;
 import com.kamrul.server.exception.UnauthorizedException;
 import com.kamrul.server.models.compositeKey.UserAndPostCompositeKey;
+import com.kamrul.server.models.medal.Medal;
 import com.kamrul.server.models.medal.MedalType;
 import com.kamrul.server.models.post.Post;
 import com.kamrul.server.models.user.User;
@@ -12,7 +13,6 @@ import com.kamrul.server.repositories.GeneralQueryRepository;
 import com.kamrul.server.repositories.PostRepository;
 import com.kamrul.server.repositories.MedalRepository;
 import com.kamrul.server.repositories.UserRepository;
-import com.kamrul.server.security.jwt.JWTUtil;
 import com.kamrul.server.services.verify.Verifier;
 import com.kamrul.server.services.verify.exception.VerificationException;
 import com.kamrul.server.utils.Converters;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kamrul.server.utils.GeneralResponseMSG.*;
 
@@ -48,23 +49,23 @@ public class PostController {
     public ResponseEntity<?> getPostById(@PathVariable(value = "id") Long postId ,@RequestAttribute("userId") Long loggedInUserId)
             throws ResourceNotFoundException {
         Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND_MSG);
-        PostDTO postDTO=new PostDTO();
-        postDTO= Converters.convert(post,postDTO);
-
+        if (post.getDraft() && (loggedInUserId==null || post.getUser().getUserId()!=loggedInUserId))
+            throw new ResourceNotFoundException(POST_NOT_FOUND_MSG);
+        PostDTO postDTO= Converters.convert(post);
         if(loggedInUserId==null)
             return new ResponseEntity<>(postDTO,HttpStatus.OK);
-
         UserAndPostCompositeKey userAndPostCompositeKey =  new UserAndPostCompositeKey(loggedInUserId,postId);
-        Optional<MedalDTO> medal= medalRepository.findMedalByCompositeKey(userAndPostCompositeKey);
+        Optional<Medal> medal= medalRepository.findMedalByUserAndPostCompositeKey(userAndPostCompositeKey);
         MedalType medalGivenByLoggedInUser= medal.isPresent()? medal.get().getMedalType() : MedalType.NO_MEDAL;
         postDTO.setMedalTypeProvidedByLoggedInUser(medalGivenByLoggedInUser);
         return new ResponseEntity<>(postDTO,HttpStatus.OK);
     }
 
-    @GetMapping("medalGivers")
-    public ResponseEntity<?> getMedalGiversOfThePost(@RequestParam(value = "id")Long postId) throws ResourceNotFoundException {
-        Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND_MSG);
-        return new ResponseEntity<>(post.getMedals(),HttpStatus.OK);
+    @GetMapping("/{id}/medalGivers")
+    public ResponseEntity<?> getMedalGiversOfThePost(@PathVariable(value = "id")Long postId) throws ResourceNotFoundException {
+        List<Medal> medals = medalRepository.findMedalsByPostId(postId);
+        List<MedalDTO> medalDTOS = medals.stream().map(medal->new MedalDTO(medal)).collect(Collectors.toList());
+        return new ResponseEntity<>(medalDTOS,HttpStatus.OK);
     }
 
     @GetMapping("/page/{pageId}")
@@ -72,13 +73,13 @@ public class PostController {
         final Integer pageSize=500;
         Page<Post> postDTOPage=postRepository.getTopPost(PageRequest.of(pageId-1,pageSize));
         List<PostDTO> postDTOs=new ArrayList<>();
-        postDTOPage.forEach(post -> postDTOs.add(Converters.convert(post,new PostDTO())));
+        postDTOPage.forEach(post -> postDTOs.add(Converters.convert(post)));
         if(loggedInUserId==null) return new ResponseEntity<>(postDTOs,HttpStatus.OK);
 
-        List<MedalDTO> medalGivenPostIds=medalRepository.getPostForCurrentlyLoggedInUserOnWhichUserGivenMedal(loggedInUserId);
+        List<Medal> medalGivenPostIds=medalRepository.findMedalsByUserId(loggedInUserId);
         //<PostID, MedalType>
         HashMap<Long,MedalType> medalTypeGivenByUser=new HashMap<>();
-        medalGivenPostIds.forEach(medalDTO->medalTypeGivenByUser.put(medalDTO.getPostId(), medalDTO.getMedalType()));
+        medalGivenPostIds.forEach(medalDTO->medalTypeGivenByUser.put(medalDTO.getPost().getPostId(), medalDTO.getMedalType()));
         postDTOs.forEach(postDTO->postDTO.setMedalTypeProvidedByLoggedInUser(medalTypeGivenByUser.getOrDefault(postDTO.getPostId(),MedalType.NO_MEDAL)));
         return new ResponseEntity<>(postDTOs,HttpStatus.OK);
     }
@@ -106,8 +107,9 @@ public class PostController {
             throw new UnauthorizedException("User Do not have permission to Update this post");
         postVerifier.verify(postDTO);
         post=Converters.convert(postDTO,post);
-        postRepository.save(post);
-        return new ResponseEntity<>(post,HttpStatus.OK);
+        post = postRepository.save(post);
+        PostDTO responsePostDto = Converters.convert(post);
+        return new ResponseEntity<>(responsePostDto,HttpStatus.OK);
     }
 
 
