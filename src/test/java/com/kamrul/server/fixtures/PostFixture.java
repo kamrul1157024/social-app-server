@@ -26,9 +26,13 @@ public class PostFixture {
         Post post = new Post();
         post.setPostTitle(faker.lorem().sentence(10));
         post.setPostText(faker.lorem().paragraph(10));
-        post.setDraft(false);
         post.setUser(user);
         post = Utils.override(post,overrides);
+        if (overrides.length>0 && overrides[0].getDraft()==true)
+            post.setDraft(true);
+        else
+            post.setDraft(false);
+
         return postRepository.save(post);
     }
 }
