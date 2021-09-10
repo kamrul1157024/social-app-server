@@ -2,9 +2,9 @@ package com.kamrul.server.controllers;
 
 import com.kamrul.server.MockRequest;
 import com.kamrul.server.dto.MedalDTO;
-import com.kamrul.server.fixtures.MedalFixture;
-import com.kamrul.server.fixtures.PostFixture;
-import com.kamrul.server.fixtures.UserFixture;
+import com.kamrul.server.fixtureFactories.MedalFixtureFactory;
+import com.kamrul.server.fixtureFactories.PostFixtureFactory;
+import com.kamrul.server.fixtureFactories.UserFixtureFactory;
 import com.kamrul.server.models.medal.MedalType;
 import com.kamrul.server.models.post.Post;
 import com.kamrul.server.models.user.User;
@@ -27,20 +27,20 @@ class MedalControllerTest {
     private UserRepository userRepository;
     private MockRequest mockRequest;
     @Autowired
-    private UserFixture userFixture;
+    private UserFixtureFactory userFixtureFactory;
     @Autowired
-    private PostFixture postFixture;
+    private PostFixtureFactory postFixtureFactory;
     @Autowired
-    private MedalFixture medalFixture;
+    private MedalFixtureFactory medalFixtureFactory;
     private Post post;
     private User user1,user2;
 
     @BeforeEach
     void setUp(){
         mockRequest = new MockRequest(mockMvc,userRepository);
-        user1 = userFixture.createAUser();
-        user2 = userFixture.createAUser();
-        post = postFixture.createAPost(user1);
+        user1 = userFixtureFactory.createAUser();
+        user2 = userFixtureFactory.createAUser();
+        post = postFixtureFactory.createAPost(user1);
     }
 
     @Test
@@ -56,7 +56,7 @@ class MedalControllerTest {
 
     @Test
     void shouldResetMedalsIfGivenNO_MEDAL() throws Exception{
-        medalFixture.giveMedal(user1,post,MedalType.GOLD);
+        medalFixtureFactory.giveMedal(user1,post,MedalType.GOLD);
         MedalDTO medalDTO = new MedalDTO();
         medalDTO.setMedalType(MedalType.NO_MEDAL);
         mockRequest.put(String.format("/api/medal/post/%s",post.getPostId()),medalDTO)

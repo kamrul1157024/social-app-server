@@ -1,8 +1,8 @@
 package com.kamrul.server.repositories;
 
-import com.kamrul.server.fixtures.MedalFixture;
-import com.kamrul.server.fixtures.PostFixture;
-import com.kamrul.server.fixtures.UserFixture;
+import com.kamrul.server.fixtureFactories.MedalFixtureFactory;
+import com.kamrul.server.fixtureFactories.PostFixtureFactory;
+import com.kamrul.server.fixtureFactories.UserFixtureFactory;
 import com.kamrul.server.models.compositeKey.UserAndPostCompositeKey;
 import com.kamrul.server.models.medal.Medal;
 import com.kamrul.server.models.medal.MedalType;
@@ -11,7 +11,6 @@ import com.kamrul.server.models.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashMap;
@@ -25,11 +24,11 @@ public class MedalRepositoryTest {
     @Autowired
     MedalRepository medalRepository;
     @Autowired
-    PostFixture postFixture;
+    PostFixtureFactory postFixtureFactory;
     @Autowired
-    MedalFixture medalFixture;
+    MedalFixtureFactory medalFixtureFactory;
     @Autowired
-    UserFixture userFixture;
+    UserFixtureFactory userFixtureFactory;
 
     User[] user = new User[3];
     HashMap<User,MedalType> userMedalType = new HashMap<>();
@@ -39,14 +38,14 @@ public class MedalRepositoryTest {
     @BeforeEach
     void setup(){
         for (int i = 0; i < 3; i++) {
-            user[i] = userFixture.createAUser();
+            user[i] = userFixtureFactory.createAUser();
         }
-        post = postFixture.createAPost(user[0]);
+        post = postFixtureFactory.createAPost(user[0]);
         userMedalType.put(user[0],MedalType.BRONZE);
         userMedalType.put(user[1],MedalType.SILVER);
         userMedalType.put(user[2],MedalType.GOLD);
         for (int i = 0; i < 3; i++) {
-            medalFixture.giveMedal(user[i],post,userMedalType.get(user[i]));
+            medalFixtureFactory.giveMedal(user[i],post,userMedalType.get(user[i]));
         }
     }
 
@@ -83,9 +82,9 @@ public class MedalRepositoryTest {
 
     @Test
     void shouldFindMedalsThatCurrentlyLoggedInUserGivenToUserId(){
-        Post post2 = postFixture.createAPost(user[0]);
-        postFixture.createAPost(user[0]);
-        medalFixture.giveMedal(user[1],post2,MedalType.BRONZE);
+        Post post2 = postFixtureFactory.createAPost(user[0]);
+        postFixtureFactory.createAPost(user[0]);
+        medalFixtureFactory.giveMedal(user[1],post2,MedalType.BRONZE);
         List<Medal> medals = medalRepository
                 .findMedalsThatCurrentlyLoggedInUserGivenToUserId(user[1].getUserId(),user[0].getUserId());
         assertEquals(2,medals.size());

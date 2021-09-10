@@ -3,9 +3,9 @@ package com.kamrul.server.controllers;
 import com.github.javafaker.Faker;
 import com.kamrul.server.MockRequest;
 import com.kamrul.server.dto.UserDTO;
-import com.kamrul.server.fixtures.MedalFixture;
-import com.kamrul.server.fixtures.PostFixture;
-import com.kamrul.server.fixtures.UserFixture;
+import com.kamrul.server.fixtureFactories.MedalFixtureFactory;
+import com.kamrul.server.fixtureFactories.PostFixtureFactory;
+import com.kamrul.server.fixtureFactories.UserFixtureFactory;
 import com.kamrul.server.models.medal.MedalType;
 import com.kamrul.server.models.post.Post;
 import com.kamrul.server.models.user.User;
@@ -29,11 +29,11 @@ class UserControllerTest {
     private UserRepository userRepository;
     private MockRequest mockRequest;
     @Autowired
-    private UserFixture userFixture;
+    private UserFixtureFactory userFixtureFactory;
     @Autowired
-    private PostFixture postFixture;
+    private PostFixtureFactory postFixtureFactory;
     @Autowired
-    private MedalFixture medalFixture;
+    private MedalFixtureFactory medalFixtureFactory;
 
     @BeforeAll
     void setUp(){
@@ -42,7 +42,7 @@ class UserControllerTest {
 
     @Test
     void shouldGetUserByUserId() throws Exception {
-        User user = userFixture.createAUser();
+        User user = userFixtureFactory.createAUser();
         ExpectationMatcher.expectToBeUser(
                 mockRequest.get(String.format("/api/user/%s",user.getUserId())),
                         user
@@ -53,7 +53,7 @@ class UserControllerTest {
     void shouldGetUserUsingUserNameAnShouldNotShowEmail() throws Exception{
         User override = new User();
         override.setEmailVisible(false);
-        User user = userFixture.createAUser(override);
+        User user = userFixtureFactory.createAUser(override);
         ExpectationMatcher.expectToBeUser(
                         mockRequest.get(String.format("/api/user/userName/%s", user.getUserName())),
                         user
@@ -64,7 +64,7 @@ class UserControllerTest {
     void shouldGetUserUsingUserNameAnShouldShowEmail() throws Exception{
         User override = new User();
         override.setEmailVisible(true);
-        User user = userFixture.createAUser(override);
+        User user = userFixtureFactory.createAUser(override);
         ExpectationMatcher.expectToBeUser(
                         mockRequest.get(String.format("/api/user/userName/%s", user.getUserName())),
                         user
@@ -97,14 +97,14 @@ class UserControllerTest {
 
     @Test
     void shouldGetUserPostWithMedalProvidedByCurrentUser() throws Exception {
-        User user = userFixture.createAUser();
+        User user = userFixtureFactory.createAUser();
         Post[] posts = new Post[5];
         for (int i = 0; i < 3; i++) {
-            posts[i] = postFixture.createAPost(user);
+            posts[i] = postFixtureFactory.createAPost(user);
         }
         User currentUser = mockRequest.getUser();
-        medalFixture.giveMedal(currentUser,posts[0],MedalType.GOLD);
-        medalFixture.giveMedal(currentUser,posts[2], MedalType.BRONZE);
+        medalFixtureFactory.giveMedal(currentUser,posts[0],MedalType.GOLD);
+        medalFixtureFactory.giveMedal(currentUser,posts[2], MedalType.BRONZE);
         mockRequest.get(String.format("/api/user/%s/posts?pageNo=1",user.getUserId()))
                 .andExpect(jsonPath("$[0].postId").value(posts[2].getPostId()))
                 .andExpect(jsonPath("$[0].medalTypeProvidedByLoggedInUser").value(MedalType.BRONZE.toString()))

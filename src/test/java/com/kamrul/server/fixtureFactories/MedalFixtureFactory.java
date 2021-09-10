@@ -1,4 +1,4 @@
-package com.kamrul.server.fixtures;
+package com.kamrul.server.fixtureFactories;
 
 import com.kamrul.server.models.compositeKey.UserAndPostCompositeKey;
 import com.kamrul.server.models.medal.Medal;
@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MedalFixture {
+public class MedalFixtureFactory {
     private final MedalRepository medalRepository;
 
     @Autowired
-    public MedalFixture(MedalRepository medalRepository){
+    public MedalFixtureFactory(MedalRepository medalRepository){
         this.medalRepository = medalRepository;
     }
 
