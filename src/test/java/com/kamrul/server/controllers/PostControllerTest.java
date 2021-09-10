@@ -143,7 +143,6 @@ class PostControllerTest  {
         medalFixtureFactory.giveMedal(user2,post, MedalType.GOLD);
         medalFixtureFactory.giveMedal(user3,post,MedalType.SILVER);
         mockRequest.get(String.format("/api/post/%s/medalGivers",post.getPostId()))
-                .andExpect(jsonPath("$[0].post.postId").value(post.getPostId()))
                 .andExpect(jsonPath("$[0].user.userId").value(user1.getUserId()))
                 .andExpect(jsonPath("$[1].user.userId").value(user2.getUserId()))
                 .andExpect(jsonPath("$[2].user.userId").value(user3.getUserId()));

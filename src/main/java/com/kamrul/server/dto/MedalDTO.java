@@ -13,12 +13,10 @@ import lombok.*;
 public class MedalDTO {
 
     private UserDTO user;
-    private PostDTO post;
     private MedalType medalType;
 
     public MedalDTO(Medal medal) {
         this.user = Converters.convert(medal.getUser());
-        this.post = Converters.convert(medal.getPost());
         this.medalType = medal.getMedalType();
     }
 }
