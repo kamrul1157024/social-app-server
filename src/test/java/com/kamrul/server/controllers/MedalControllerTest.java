@@ -1,7 +1,6 @@
 package com.kamrul.server.controllers;
 
 import com.kamrul.server.MockRequest;
-import com.kamrul.server.dto.MedalDTO;
 import com.kamrul.server.fixtureFactories.MedalFixtureFactory;
 import com.kamrul.server.fixtureFactories.PostFixtureFactory;
 import com.kamrul.server.fixtureFactories.UserFixtureFactory;
@@ -45,9 +44,7 @@ class MedalControllerTest {
 
     @Test
     void shouldGiveMedalToPostProperly() throws Exception {
-        MedalDTO medalDTO = new MedalDTO();
-        medalDTO.setMedalType(MedalType.GOLD);
-        mockRequest.put(String.format("/api/medal/post/%s",post.getPostId()),medalDTO)
+        mockRequest.put(String.format("/api/medal/post/%s/medal/%s",post.getPostId(),"GOLD"),null)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalGold").value(1))
                 .andExpect(jsonPath("$.totalBronze").value(0))
@@ -57,21 +54,17 @@ class MedalControllerTest {
     @Test
     void shouldResetMedalsIfGivenNO_MEDAL() throws Exception{
         medalFixtureFactory.giveMedal(user1,post,MedalType.GOLD);
-        MedalDTO medalDTO = new MedalDTO();
-        medalDTO.setMedalType(MedalType.NO_MEDAL);
-        mockRequest.put(String.format("/api/medal/post/%s",post.getPostId()),medalDTO)
+        mockRequest.put(String.format("/api/medal/post/%s/medal/%s",post.getPostId(),"NO_MEDAL"),null)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalGold").value(0));
     }
 
     @Test
     void shouldNotChangeMedalCountIfSameMedalIsGivenTwice() throws Exception{
-        MedalDTO medalDTO = new MedalDTO();
-        medalDTO.setMedalType(MedalType.GOLD);
-        mockRequest.put(String.format("/api/medal/post/%s",post.getPostId()),medalDTO)
+        mockRequest.put(String.format("/api/medal/post/%s/medal/GOLD",post.getPostId()),null)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalGold").value(1));
-        mockRequest.put(String.format("/api/medal/post/%s",post.getPostId()),medalDTO)
+        mockRequest.put(String.format("/api/medal/post/%s/medal/GOLD",post.getPostId()),null)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalGold").value(1));
     }

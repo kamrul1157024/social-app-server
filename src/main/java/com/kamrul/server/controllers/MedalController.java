@@ -36,25 +36,24 @@ public class MedalController {
     @Autowired
     private MedalRepository medalRepository;
 
-    @PutMapping("/post/{postId}")
+    @PutMapping("/post/{postId}/medal/{medalType}")
     @Transactional(rollbackOn = {Exception.class})
-    ResponseEntity<?> giveMedalOnThePost(@RequestBody MedalDTO medalDataFromUser, @PathVariable("postId")Long postId, @RequestAttribute("userId") Long userId)
-            throws ResourceNotFoundException {
-        MedalType userProvidedMedalType=medalDataFromUser.getMedalType();
+    ResponseEntity<?> giveMedalOnThePost(
+            @PathVariable("medalType")MedalType userProvidedMedalType,
+            @PathVariable("postId")Long postId, @RequestAttribute("userId") Long userId
+    ) throws ResourceNotFoundException {
         Post post=GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND_MSG);
         User user=GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND_MSG);
 
         UserAndPostCompositeKey userAndPostCompositeKey = new UserAndPostCompositeKey(userId,postId);
         Optional<Medal> optionalMedal= medalRepository.findMedalByUserAndPostCompositeKey(userAndPostCompositeKey);
 
-        /* Required SQL Query Optimization */
         if(!optionalMedal.isPresent()) {
             Medal medal =new Medal(userAndPostCompositeKey,user, post, userProvidedMedalType);
             post.addMedalCount(userProvidedMedalType);
             medalRepository.save(medal);
         }
         else {
-            /* Need to Perform Indexing on (userId,postId) */
             Medal previousMedalDto=optionalMedal.get();
             Medal previousMedal= new Medal(userAndPostCompositeKey,user,post,previousMedalDto.getMedalType());
             Medal updatedMedal=new Medal(userAndPostCompositeKey,user,post,userProvidedMedalType);

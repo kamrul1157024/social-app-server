@@ -62,7 +62,7 @@ public class PostController {
     }
 
     @GetMapping("/{id}/medalGivers")
-    public ResponseEntity<?> getMedalGiversOfThePost(@PathVariable(value = "id")Long postId) throws ResourceNotFoundException {
+    public ResponseEntity<?> getMedalGiversOfThePost(@PathVariable(value = "id")Long postId){
         List<Medal> medals = medalRepository.findMedalsByPostId(postId);
         List<MedalDTO> medalDTOS = medals.stream().map(medal->new MedalDTO(medal)).collect(Collectors.toList());
         return new ResponseEntity<>(medalDTOS,HttpStatus.OK);
