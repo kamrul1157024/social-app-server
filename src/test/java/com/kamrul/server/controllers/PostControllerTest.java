@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import com.kamrul.server.MockRequest;
 import com.kamrul.server.dto.PostDTO;
-import com.kamrul.server.fixtures.MedalFixture;
-import com.kamrul.server.fixtures.PostFixture;
-import com.kamrul.server.fixtures.UserFixture;
+import com.kamrul.server.fixtureFactories.MedalFixtureFactory;
+import com.kamrul.server.fixtureFactories.PostFixtureFactory;
+import com.kamrul.server.fixtureFactories.UserFixtureFactory;
 import com.kamrul.server.models.medal.MedalType;
 import com.kamrul.server.models.post.Post;
 import com.kamrul.server.models.user.User;
@@ -37,11 +37,11 @@ class PostControllerTest  {
     private UserRepository userRepository;
     private MockRequest mockRequest;
     @Autowired
-    private PostFixture postFixture;
+    private PostFixtureFactory postFixtureFactory;
     @Autowired
-    private UserFixture userFixture;
+    private UserFixtureFactory userFixtureFactory;
     @Autowired
-    private MedalFixture medalFixture;
+    private MedalFixtureFactory medalFixtureFactory;
     private final Faker faker = new Faker();
     @Autowired
     private PostVerifier postVerifier;
@@ -88,7 +88,7 @@ class PostControllerTest  {
         ImmutablePair<Post,PostDTO> pair = createPost();
         Post post = pair.getLeft();
         PostDTO postDTO = pair.getRight();
-        medalFixture.giveMedal(mockRequest.getUser(),post,MedalType.BRONZE);
+        medalFixtureFactory.giveMedal(mockRequest.getUser(),post,MedalType.BRONZE);
         mockRequest.get(String.format("/api/post/%s",post.getPostId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.postId").isNotEmpty())
@@ -101,20 +101,20 @@ class PostControllerTest  {
 
     @Test
     void shouldNotGetDraftPostOfDifferentUser() throws Exception{
-        User user = userFixture.createAUser();
+        User user = userFixtureFactory.createAUser();
         Post overrides  = new Post();
         overrides.setDraft(true);
-        Post post = postFixture.createAPost(user,overrides);
+        Post post = postFixtureFactory.createAPost(user,overrides);
         mockRequest.get(String.format("/api/post/%s",post.getPostId()))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void shouldNotGetDraftPostByUnAuthorizedUser() throws Exception{
-        User user = userFixture.createAUser();
+        User user = userFixtureFactory.createAUser();
         Post overrides = new Post();
         overrides.setDraft(true);
-        Post post = postFixture.createAPost(user,overrides);
+        Post post = postFixtureFactory.createAPost(user,overrides);
         mockRequest.getAsUnAuthorized(String.format("/api/post/%s",post.getPostId()))
                 .andExpect(status().isNotFound());
     }
@@ -135,13 +135,13 @@ class PostControllerTest  {
 
     @Test
     void shouldReturnMedalGiverOfThePostProperly() throws Exception{
-        User user1 = userFixture.createAUser();
-        User user2 = userFixture.createAUser();
-        User user3 = userFixture.createAUser();
-        Post post = postFixture.createAPost(user1);
-        medalFixture.giveMedal(user1,post, MedalType.SILVER);
-        medalFixture.giveMedal(user2,post, MedalType.GOLD);
-        medalFixture.giveMedal(user3,post,MedalType.SILVER);
+        User user1 = userFixtureFactory.createAUser();
+        User user2 = userFixtureFactory.createAUser();
+        User user3 = userFixtureFactory.createAUser();
+        Post post = postFixtureFactory.createAPost(user1);
+        medalFixtureFactory.giveMedal(user1,post, MedalType.SILVER);
+        medalFixtureFactory.giveMedal(user2,post, MedalType.GOLD);
+        medalFixtureFactory.giveMedal(user3,post,MedalType.SILVER);
         mockRequest.get(String.format("/api/post/%s/medalGivers",post.getPostId()))
                 .andExpect(jsonPath("$[0].post.postId").value(post.getPostId()))
                 .andExpect(jsonPath("$[0].user.userId").value(user1.getUserId()))
@@ -154,7 +154,7 @@ class PostControllerTest  {
         User overrides = new User();
         overrides.setLastName("kamrul");
         overrides.setIsEmailVerified(true);
-        userFixture.createAUser(overrides);
+        userFixtureFactory.createAUser(overrides);
         ImmutablePair<Post,PostDTO> pair = createPost();
         Post post = pair.getLeft();
         mockRequest.delete(String.format("/api/post/%s",post.getPostId()),post)

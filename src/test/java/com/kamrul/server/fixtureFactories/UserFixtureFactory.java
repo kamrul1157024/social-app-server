@@ -1,4 +1,4 @@
-package com.kamrul.server.fixtures;
+package com.kamrul.server.fixtureFactories;
 
 import com.github.javafaker.Faker;
 import com.kamrul.server.Config;
@@ -9,11 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserFixture {
+public class UserFixtureFactory {
     private final UserRepository userRepository;
 
     @Autowired
-    public UserFixture(UserRepository userRepository){
+    public UserFixtureFactory(UserRepository userRepository){
         this.userRepository = userRepository;
     }
 

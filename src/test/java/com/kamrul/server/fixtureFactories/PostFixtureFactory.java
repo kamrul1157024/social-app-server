@@ -1,23 +1,19 @@
-package com.kamrul.server.fixtures;
+package com.kamrul.server.fixtureFactories;
 
 import com.github.javafaker.Faker;
 import com.kamrul.server.Utils;
-import com.kamrul.server.models.compositeKey.UserAndPostCompositeKey;
-import com.kamrul.server.models.medal.Medal;
-import com.kamrul.server.models.medal.MedalType;
 import com.kamrul.server.models.post.Post;
 import com.kamrul.server.models.user.User;
-import com.kamrul.server.repositories.MedalRepository;
 import com.kamrul.server.repositories.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PostFixture {
+public class PostFixtureFactory {
     private final PostRepository postRepository;
 
     @Autowired
-    public PostFixture(PostRepository postRepository){
+    public PostFixtureFactory(PostRepository postRepository){
         this.postRepository = postRepository;
     }
 
