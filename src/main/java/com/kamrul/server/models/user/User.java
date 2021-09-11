@@ -3,7 +3,6 @@ package com.kamrul.server.models.user;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.kamrul.server.models.booklet.Booklet;
 import com.kamrul.server.models.comment.Comment;
-import com.kamrul.server.models.comment.CommentReply;
 import com.kamrul.server.models.community.Community;
 import com.kamrul.server.models.medal.Medal;
 import com.kamrul.server.models.post.Post;
@@ -97,10 +96,6 @@ public class User implements Comparable<User> {
     @JsonBackReference("comments")
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Comment> comments;
-
-    @JsonBackReference("comment_replies")
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<CommentReply> commentReplies;
 
     @JsonBackReference("user_medal")
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)

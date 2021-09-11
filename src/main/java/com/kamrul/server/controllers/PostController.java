@@ -48,9 +48,9 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getPostById(@PathVariable(value = "id") Long postId ,@RequestAttribute("userId") Long loggedInUserId)
             throws ResourceNotFoundException {
-        Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND_MSG);
+        Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND);
         if (post.getDraft() && (loggedInUserId==null || post.getUser().getUserId()!=loggedInUserId))
-            throw new ResourceNotFoundException(POST_NOT_FOUND_MSG);
+            throw new ResourceNotFoundException(POST_NOT_FOUND);
         PostDTO postDTO= Converters.convert(post);
         if(loggedInUserId==null)
             return new ResponseEntity<>(postDTO,HttpStatus.OK);
@@ -88,7 +88,7 @@ public class PostController {
     @Transactional(rollbackOn = {Exception.class})
     public ResponseEntity<?> createPost(@RequestBody PostDTO postDTO,@RequestAttribute("userId") Long loggedInUserId)
             throws ResourceNotFoundException, VerificationException,StackOverflowError {
-        User user= GeneralQueryRepository.getByID(userRepository,loggedInUserId, USER_NOT_FOUND_MSG);
+        User user= GeneralQueryRepository.getByID(userRepository,loggedInUserId, USER_NOT_FOUND);
         postDTO.setUser(user);
         postVerifier.verify(postDTO);
         Post post=new Post();
@@ -101,8 +101,8 @@ public class PostController {
     @Transactional(rollbackOn = {Exception.class})
     public ResponseEntity<?> updatePost(@RequestBody PostDTO postDTO, @RequestAttribute("userId") Long loggedInUserId)
             throws ResourceNotFoundException, UnauthorizedException, VerificationException {
-        User user= GeneralQueryRepository.getByID(userRepository,loggedInUserId, USER_NOT_FOUND_MSG);
-        Post post= GeneralQueryRepository.getByID(postRepository, postDTO.getPostId(), POST_NOT_FOUND_MSG);
+        User user= GeneralQueryRepository.getByID(userRepository,loggedInUserId, USER_NOT_FOUND);
+        Post post= GeneralQueryRepository.getByID(postRepository, postDTO.getPostId(), POST_NOT_FOUND);
         if(!user.equals(post.getUser()))
             throw new UnauthorizedException("User Do not have permission to Update this post");
         postVerifier.verify(postDTO);
@@ -116,8 +116,8 @@ public class PostController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePost(@PathVariable(value = "id") Long postId,@RequestAttribute("userId") Long loggedInUserId)
             throws ResourceNotFoundException, UnauthorizedException {
-        User user= GeneralQueryRepository.getByID(userRepository, loggedInUserId, USER_NOT_FOUND_MSG);
-        Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND_MSG);
+        User user= GeneralQueryRepository.getByID(userRepository, loggedInUserId, USER_NOT_FOUND);
+        Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND);
         if(!user.equals(post.getUser()))
             throw new UnauthorizedException("User Do no have permission to delete this post");
         postRepository.deleteInBatch(Arrays.asList(post));

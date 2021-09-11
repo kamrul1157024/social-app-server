@@ -1,27 +1,29 @@
 package com.kamrul.server.controllers;
 
 
+import com.kamrul.server.configuration.PageConfiguration;
 import com.kamrul.server.dto.CommentDTO;
 import com.kamrul.server.exception.ResourceNotFoundException;
 import com.kamrul.server.exception.UnauthorizedException;
 import com.kamrul.server.models.comment.Comment;
-import com.kamrul.server.models.post.Post;
+import com.kamrul.server.models.comment.CommentForType;
 import com.kamrul.server.models.user.User;
 import com.kamrul.server.repositories.CommentRepository;
 import com.kamrul.server.repositories.GeneralQueryRepository;
 import com.kamrul.server.repositories.PostRepository;
 import com.kamrul.server.repositories.UserRepository;
 import com.kamrul.server.services.verify.Verifier;
-import com.kamrul.server.services.verify.exception.VerificationException;
 import com.kamrul.server.utils.Message;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 import static com.kamrul.server.utils.GeneralResponseMSG.*;
 
@@ -39,60 +41,79 @@ public class CommentController {
     @Autowired
     Verifier<CommentDTO> commentVerifier;
 
-
-    @GetMapping
-    public ResponseEntity<?> getCommentById(@RequestParam(value = "id") Long commentId)
+    private void verifyCommentForType(CommentForType commentForType, Long commentForId)
             throws ResourceNotFoundException {
-        Comment comment= GeneralQueryRepository.getByID(commentRepository, commentId, COMMENT_NOT_FOUND_MSG);
-        return new ResponseEntity<>(comment, HttpStatus.OK);
+        if(commentForType==CommentForType.POST) {
+            GeneralQueryRepository.getByID(postRepository,commentForId, POST_NOT_FOUND);
+        }
     }
 
-    @GetMapping("/post/{postId}")
-    public ResponseEntity<?> getCommentByPostId(@PathVariable(value = "postId") Long postId) {
-        List<Comment> comments=commentRepository.getCommentsByPostID(postId);
+    @GetMapping("/commentForType/{commentForType}/commentFor/{commentFor}")
+    public ResponseEntity<?> getCommentByPostId(
+            @PathVariable(value = "commentForType") CommentForType commentForType,
+            @PathVariable(value = "commentFor") Long commentFor,
+            @RequestParam(value = "page") Integer page) {
+        Page<Comment> comments = commentRepository.getCommentsByCommentForTypeAndAndCommentFor(
+                        commentForType,
+                        commentFor,
+                        PageRequest.of(page, PageConfiguration.COMMENT_PAGE_SIZE)
+                );
+        System.out.println(comments.getContent());
         return new ResponseEntity<>(comments,HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping()
     @Transactional(rollbackOn = {Exception.class})
-    public ResponseEntity<?> createComment(@RequestBody CommentDTO commentDTO, @RequestAttribute("userId") Long userId)
-            throws ResourceNotFoundException, VerificationException {
-        User user= GeneralQueryRepository.getByID(userRepository,userId, USER_NOT_FOUND_MSG);
-        Post post= GeneralQueryRepository.getByID(postRepository, commentDTO.getPostId(), POST_NOT_FOUND_MSG);
-        Comment comment=new Comment();
-        comment.setCommentText(commentDTO.getCommentText());
-        comment.setUser(user);
-        comment.setPost(post);
+    public ResponseEntity<?> createComment(
+            @RequestBody CommentDTO commentDTO,
+            @RequestAttribute("userId") Long userId) throws ResourceNotFoundException{
+        CommentForType commentForType = commentDTO.getCommentForType();
+        Long commentFor = commentDTO.getCommentFor();
+        verifyCommentForType(commentForType,commentFor);
+        User user= GeneralQueryRepository.getByID(userRepository,userId, USER_NOT_FOUND);
+        Comment comment=new Comment(user,commentDTO.getCommentText(), commentForType, commentFor);
+        Comment commentResponse = commentRepository.save(comment);
+        return new ResponseEntity<>(commentResponse, HttpStatus.ACCEPTED);
+    }
 
-        commentVerifier.verify(commentDTO);
-        commentRepository.save(comment);
-        return new ResponseEntity<>(comment, HttpStatus.ACCEPTED);
+    @PostMapping("/replyTo/comment/{commentId}")
+    @Transactional(rollbackOn = {Exception.class})
+    public ResponseEntity<?> replyToComment(
+            @RequestBody CommentDTO commentDTO,
+            @PathVariable("commentId")Long commentId,
+            @RequestAttribute("userId")Long userId) throws ResourceNotFoundException{
+        User user= GeneralQueryRepository.getByID(userRepository,userId, USER_NOT_FOUND);
+        Comment comment= GeneralQueryRepository.getByID(commentRepository,commentId,COMMENT_NOT_FOUND);
+        Comment reply = new Comment(user,comment,commentDTO.getCommentText());
+        Comment replyResponse = commentRepository.save(reply);
+        return new ResponseEntity<>(replyResponse, HttpStatus.ACCEPTED);
     }
 
     @PutMapping
     @Transactional(rollbackOn = {Exception.class})
     public ResponseEntity<?> updateComment(@RequestBody CommentDTO commentDTO,@RequestAttribute("userId")Long userId)
-            throws ResourceNotFoundException, UnauthorizedException, VerificationException {
-        User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND_MSG);
-        Comment comment= GeneralQueryRepository.getByID(commentRepository, commentDTO.getCommentId(), COMMENT_NOT_FOUND_MSG);
+            throws ResourceNotFoundException, UnauthorizedException {
+        User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND);
+        Long commentId = commentDTO.getCommentId();
+        Comment comment= GeneralQueryRepository.getByID(commentRepository,commentId,COMMENT_NOT_FOUND);
         if(!user.equals(comment.getUser()))
             throw new UnauthorizedException("User Do no have permission to update this post");
-        commentVerifier.verify(commentDTO);
         comment.setCommentText(commentDTO.getCommentText());
-        commentRepository.save(comment);
-        return new ResponseEntity<>(comment,HttpStatus.OK);
+        comment.setUpdated(true);
+        Comment commentResponse = commentRepository.save(comment);
+        return new ResponseEntity<>(commentResponse,HttpStatus.OK);
     }
 
-
-    @DeleteMapping
-    public ResponseEntity<?> deleteComment(@RequestParam(value = "id") Long commentId,@RequestAttribute("userId")Long userId)
+    @DeleteMapping("/{commentId}")
+    @Transactional(rollbackOn = {Exception.class})
+    public ResponseEntity<?> deleteComment(@PathVariable(value = "commentId") Long commentId,@RequestAttribute("userId")Long userId)
             throws ResourceNotFoundException, UnauthorizedException {
-        User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND_MSG);
-        Comment comment= GeneralQueryRepository.getByID(commentRepository, commentId, COMMENT_NOT_FOUND_MSG);
-
+        User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND);
+        Comment comment= GeneralQueryRepository.getByID(commentRepository, commentId,COMMENT_NOT_FOUND);
+        Set<Comment> replies = comment.getReplies();
         if(!user.equals(comment.getUser()))
             throw new UnauthorizedException("User Do no have permission to delete this Comment");
-
+        commentRepository.deleteInBatch(replies);
         commentRepository.deleteInBatch(Arrays.asList(comment));
         return new ResponseEntity<>(new Message("Comment Deleted Successfully"),HttpStatus.OK);
     }

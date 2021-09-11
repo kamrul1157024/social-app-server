@@ -45,8 +45,8 @@ public class SavePostController {
     ResponseEntity<?> saveThisPost(@RequestBody SavedPostDTO savedPostDTO, @RequestAttribute("userId")Long userId)
             throws ResourceNotFoundException {
         Long postId= savedPostDTO.getPostId();
-        User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND_MSG);
-        Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND_MSG);
+        User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND);
+        Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND);
 
         UserAndPostCompositeKey userAndPostCompositeKey=new UserAndPostCompositeKey(userId,postId);
         Optional<SavedPost> savedPost=savedPostRepository.findById(userAndPostCompositeKey);

@@ -4,8 +4,6 @@ import com.kamrul.server.dto.PostDTO;
 import com.kamrul.server.dto.UserDTO;
 import com.kamrul.server.exception.ResourceNotFoundException;
 import com.kamrul.server.models.booklet.Booklet;
-import com.kamrul.server.models.medal.Medal;
-import com.kamrul.server.models.medal.MedalType;
 import com.kamrul.server.models.post.Post;
 import com.kamrul.server.models.user.User;
 import com.kamrul.server.repositories.*;
@@ -20,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kamrul.server.utils.GeneralResponseMSG.USER_NOT_FOUND_MSG;
+import static com.kamrul.server.utils.GeneralResponseMSG.USER_NOT_FOUND;
 
 @CrossOrigin
 @RestController
@@ -44,8 +42,8 @@ public class UserController {
     @GetMapping("/{userId}")
     public ResponseEntity<?> getUserDetails(@PathVariable(value = "userId") Long userId)
             throws ResourceNotFoundException {
-        User user= GeneralQueryRepository.getByID(userRepository,userId,USER_NOT_FOUND_MSG);
-        if(this.isUserDeleted(user)) throw new ResourceNotFoundException(USER_NOT_FOUND_MSG);
+        User user= GeneralQueryRepository.getByID(userRepository,userId, USER_NOT_FOUND);
+        if(this.isUserDeleted(user)) throw new ResourceNotFoundException(USER_NOT_FOUND);
         UserDTO userDTO=Converters.convert(user);
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
@@ -54,14 +52,14 @@ public class UserController {
     public ResponseEntity<?> getUserDetailsByUserName(@PathVariable("userName") String userName)
             throws ResourceNotFoundException {
         Optional<User> user=userRepository.findByUserName(userName);
-        if(user.isEmpty() || (!user.isEmpty() && this.isUserDeleted(user.get()))) throw new ResourceNotFoundException(USER_NOT_FOUND_MSG);
+        if(user.isEmpty() || (!user.isEmpty() && this.isUserDeleted(user.get()))) throw new ResourceNotFoundException(USER_NOT_FOUND);
         UserDTO userDTO=Converters.convert(user.get());
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
 
     @GetMapping("/currentlyLoggedInUser")
     public ResponseEntity<?> getCurrentlyLoggedInUser(@RequestAttribute("userId")Long userId) throws ResourceNotFoundException {
-        User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND_MSG);
+        User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND);
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
@@ -90,7 +88,7 @@ public class UserController {
     @GetMapping("/booklet")
     ResponseEntity<?> getUserBooklet(@RequestParam("userId")Long userId) throws ResourceNotFoundException {
         /*Just To through ResourceNotFoundException*/
-        GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND_MSG);
+        GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND);
         List<Booklet> userBookLets=bookletRepository.getBookletByUserId(userId);
         return new ResponseEntity<>(userBookLets,HttpStatus.OK);
     }
@@ -105,7 +103,7 @@ public class UserController {
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO,@RequestAttribute("userId") Long userId)
             throws ResourceNotFoundException {
-        User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND_MSG);
+        User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND);
         user=Converters.convert(userDTO,user);
         user = userRepository.save(user);
         return new ResponseEntity<>(user,HttpStatus.OK);
@@ -114,7 +112,7 @@ public class UserController {
     @DeleteMapping
     public ResponseEntity<?> deleteUser(@RequestAttribute("userId") Long userId)
             throws ResourceNotFoundException {
-        User user= GeneralQueryRepository.getByID(userRepository,userId, USER_NOT_FOUND_MSG);
+        User user= GeneralQueryRepository.getByID(userRepository,userId, USER_NOT_FOUND);
         user.setDeleted(true);
         userRepository.save(user);
         return new ResponseEntity<>(new Message("User deleted"),HttpStatus.OK);

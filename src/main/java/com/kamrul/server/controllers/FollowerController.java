@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.transaction.Transactional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import static com.kamrul.server.utils.GeneralResponseMSG.USER_NOT_FOUND_MSG;
+import static com.kamrul.server.utils.GeneralResponseMSG.USER_NOT_FOUND;
 
 @CrossOrigin
 @RestController
@@ -52,8 +52,8 @@ public class FollowerController {
             throws UnauthorizedException, ResourceNotFoundException {
         Long loggedInUsedWantsToFollowUserId= followDTO.getFollow();
 
-        User loggedInUser= GeneralQueryRepository.getByID(userRepository, loggedInUserId, USER_NOT_FOUND_MSG);
-        User loggedInUserWantsToFollowUser = GeneralQueryRepository.getByID(userRepository, loggedInUsedWantsToFollowUserId, USER_NOT_FOUND_MSG);
+        User loggedInUser= GeneralQueryRepository.getByID(userRepository, loggedInUserId, USER_NOT_FOUND);
+        User loggedInUserWantsToFollowUser = GeneralQueryRepository.getByID(userRepository, loggedInUsedWantsToFollowUserId, USER_NOT_FOUND);
 
         /* May required optimization on Saving on Table */
         Set<User> loggedInUserCurrentlyFollowed= loggedInUser.getFollowed();

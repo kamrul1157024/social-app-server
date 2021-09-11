@@ -2,11 +2,9 @@ package com.kamrul.server.models.post;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kamrul.server.services.verify.Verifiable;
 import com.kamrul.server.models.savedPost.SavedPost;
 import com.kamrul.server.models.tag.Tag;
 import com.kamrul.server.models.user.User;
-import com.kamrul.server.models.comment.Comment;
 import com.kamrul.server.models.medal.Medal;
 import com.kamrul.server.models.medal.MedalType;
 import lombok.*;
@@ -60,9 +58,6 @@ public class Post {
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
-    private List<Comment> comments;
-
     @JsonBackReference
     @OneToMany(mappedBy = "post",fetch = FetchType.LAZY)
     private List<Medal> medals;
@@ -77,8 +72,6 @@ public class Post {
             inverseJoinColumns =  {@JoinColumn(name = "tag_id")}
     )
     private List<Tag> tags;
-
-
 
     private void init() {
         if(this.postId==null)

@@ -8,7 +8,6 @@ import com.kamrul.server.repositories.BookletContentRepository;
 import com.kamrul.server.repositories.BookletRepository;
 import com.kamrul.server.repositories.GeneralQueryRepository;
 import com.kamrul.server.repositories.UserRepository;
-import com.kamrul.server.security.jwt.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +15,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.util.Arrays;
-import java.util.Optional;
 
-import static com.kamrul.server.utils.GeneralResponseMSG.BOOKLET_NOT_FOUND_MSG;
-import static com.kamrul.server.utils.GeneralResponseMSG.USER_NOT_FOUND_MSG;
+import static com.kamrul.server.utils.GeneralResponseMSG.BOOKLET_NOT_FOUND;
+import static com.kamrul.server.utils.GeneralResponseMSG.USER_NOT_FOUND;
 
 @CrossOrigin
 @RestController
@@ -35,7 +33,7 @@ public class BookletController {
     @GetMapping
     ResponseEntity<?> getBookLetById(@RequestParam("id") Long bookletId)
             throws ResourceNotFoundException {
-        Booklet booklet= GeneralQueryRepository.getByID(bookletRepository, bookletId, BOOKLET_NOT_FOUND_MSG);
+        Booklet booklet= GeneralQueryRepository.getByID(bookletRepository, bookletId, BOOKLET_NOT_FOUND);
         return new ResponseEntity<>(booklet, HttpStatus.OK);
     }
 
@@ -46,7 +44,7 @@ public class BookletController {
         User loggedInUser=GeneralQueryRepository.getByID(
                 userRepository,
                 loggedInUserId,
-                USER_NOT_FOUND_MSG);
+                USER_NOT_FOUND);
         Booklet bookletToSaveOnDatabase=new Booklet();
         bookletToSaveOnDatabase.setBookletTitle(booklet.getBookletTitle());
         bookletToSaveOnDatabase.setBookletDescription(booklet.getBookletDescription());
@@ -65,9 +63,9 @@ public class BookletController {
     @PutMapping
     ResponseEntity<?> updateBooklet(@RequestBody Booklet updatedBooklet, @RequestAttribute("userId")Long userId)
             throws ResourceNotFoundException {
-      User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND_MSG);
+      User user= GeneralQueryRepository.getByID(userRepository, userId, USER_NOT_FOUND);
       /* Checking Booklet Exist! */
-      GeneralQueryRepository.getByID(bookletRepository, updatedBooklet.getBookletId(), BOOKLET_NOT_FOUND_MSG);
+      GeneralQueryRepository.getByID(bookletRepository, updatedBooklet.getBookletId(), BOOKLET_NOT_FOUND);
       updatedBooklet.setUser(user);
       bookletRepository.save(updatedBooklet);
       return new ResponseEntity<>(updatedBooklet,HttpStatus.OK);
@@ -77,7 +75,7 @@ public class BookletController {
     @DeleteMapping
     ResponseEntity<?> deleteBookLetById(@RequestParam("bookletId") Long bookletId)
             throws ResourceNotFoundException {
-        Booklet booklet=GeneralQueryRepository.getByID(bookletRepository, bookletId, BOOKLET_NOT_FOUND_MSG);
+        Booklet booklet=GeneralQueryRepository.getByID(bookletRepository, bookletId, BOOKLET_NOT_FOUND);
         bookletRepository.deleteInBatch(Arrays.asList(booklet));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
