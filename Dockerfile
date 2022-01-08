@@ -10,6 +10,8 @@ RUN apt-get update && \
     apt-get clean && \
     update-ca-certificates -f;
 
+RUN apt-get install -y curl
+
 WORkDIR /app/server
 COPY . /app/server
 

@@ -68,13 +68,4 @@ public class AuthenticationService {
         UserDTO userOutDTO= Converters.convert(user);
         return new ResponseEntity<>(userOutDTO,HttpStatus.ACCEPTED);
     }
-
-    @GetMapping("/test")
-    public String user()
-    {
-        return "<h1>test Successful</h1>";
-    }
-
-
-
 }
