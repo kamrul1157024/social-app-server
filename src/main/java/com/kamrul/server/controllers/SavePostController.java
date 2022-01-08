@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
-import static com.kamrul.server.utils.GeneralResponseMSG.*;
+import static com.kamrul.server.configuration.GeneralResponseMSG.*;
 
 @CrossOrigin
 @RestController

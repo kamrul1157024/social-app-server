@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.transaction.Transactional;
 import java.util.Arrays;
 
-import static com.kamrul.server.utils.GeneralResponseMSG.BOOKLET_NOT_FOUND;
-import static com.kamrul.server.utils.GeneralResponseMSG.USER_NOT_FOUND;
+import static com.kamrul.server.configuration.GeneralResponseMSG.BOOKLET_NOT_FOUND;
+import static com.kamrul.server.configuration.GeneralResponseMSG.USER_NOT_FOUND;
 
 @CrossOrigin
 @RestController

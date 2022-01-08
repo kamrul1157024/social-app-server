@@ -28,7 +28,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kamrul.server.utils.GeneralResponseMSG.*;
+import static com.kamrul.server.configuration.GeneralResponseMSG.*;
 
 @CrossOrigin
 @RestController
