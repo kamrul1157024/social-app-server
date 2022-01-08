@@ -46,7 +46,7 @@ public class PostController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getPostById(@PathVariable(value = "id") Long postId ,@RequestAttribute("userId") Long loggedInUserId)
+    public ResponseEntity<?> getPostById(@PathVariable(value = "id") Long postId ,@RequestAttribute(name = "userId", required = false) Long loggedInUserId)
             throws ResourceNotFoundException {
         Post post= GeneralQueryRepository.getByID(postRepository, postId, POST_NOT_FOUND);
         if (post.getDraft() && (loggedInUserId==null || post.getUser().getUserId()!=loggedInUserId))
@@ -69,7 +69,7 @@ public class PostController {
     }
 
     @GetMapping("/page/{pageId}")
-    public ResponseEntity<?> getPostByPage(@PathVariable(value = "pageId") Integer pageId, @RequestAttribute("userId") Long loggedInUserId) {
+    public ResponseEntity<?> getPostByPage(@PathVariable(value = "pageId") Integer pageId, @RequestAttribute(name = "userId", required = false) Long loggedInUserId) {
         final Integer pageSize=500;
         Page<Post> postDTOPage=postRepository.getTopPost(PageRequest.of(pageId-1,pageSize));
         List<PostDTO> postDTOs=new ArrayList<>();

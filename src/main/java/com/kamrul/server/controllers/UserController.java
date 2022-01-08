@@ -67,7 +67,7 @@ public class UserController {
     public ResponseEntity<?> getUserPost(
             @PathVariable(value = "userId") Long userId,
             @RequestParam("pageNo") Integer pageNo,
-            @RequestAttribute("userId") Long currentlyLoggedInUserId){
+            @RequestAttribute(name = "userId", required = false) Long currentlyLoggedInUserId){
         final Integer pageSize=500;
         if(currentlyLoggedInUserId==null){
             Page<Post> postPage=postRepository.getPostByUserId(userId, PageRequest.of(pageNo-1,pageSize));
