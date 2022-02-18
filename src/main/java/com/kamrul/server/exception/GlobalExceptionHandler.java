@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     {
         ErrorDetails errorDetails=new ErrorDetails(
           new Date(),
-          e.getMessage(),
+          "something is wrong!",
                 "Please Check The Documentation"
         );
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
