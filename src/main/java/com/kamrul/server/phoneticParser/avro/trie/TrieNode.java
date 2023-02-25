@@ -2,7 +2,6 @@ package com.kamrul.server.phoneticParser.avro.trie;
 import java.util.HashMap;
 
 public class TrieNode {
-    private Character character;
     private HashMap<Character,TrieNode> nextNode;
     private int patternPos;
     private Boolean isEndPoint;
@@ -12,7 +11,6 @@ public class TrieNode {
     }
 
     public TrieNode(Character character) {
-        this.character = character;
         this.nextNode=new HashMap<>();
     }
 

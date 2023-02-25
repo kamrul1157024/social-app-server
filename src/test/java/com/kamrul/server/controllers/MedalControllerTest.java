@@ -32,13 +32,12 @@ class MedalControllerTest {
     @Autowired
     private MedalFixtureFactory medalFixtureFactory;
     private Post post;
-    private User user1,user2;
+    private User user1;
 
     @BeforeEach
     void setUp(){
         mockRequest = new MockRequest(mockMvc,userRepository);
         user1 = userFixtureFactory.createAUser();
-        user2 = userFixtureFactory.createAUser();
         post = postFixtureFactory.createAPost(user1);
     }
 

@@ -7,14 +7,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 public class AppUserDetails implements UserDetails {
 
     private Long userId;
     private final String userName;
     private final String password;
-    private List<GrantedAuthority> authorities;
 
     public AppUserDetails(User user) {
         this.userId=user.getUserId();

@@ -10,7 +10,6 @@ import java.util.Locale;
 
 public class AutoCorrectTrie {
     private final TrieNode head;
-    private AutoCorrectLoader autoCorrectLoader;
     private static volatile AutoCorrectTrie autoCorrectTrie=null;
 
     @SneakyThrows
@@ -18,12 +17,12 @@ public class AutoCorrectTrie {
 
         JSONObject jsonDict=autoCorrectLoader.getJsonDict();
 
-        Iterator<String> jsonDictIterator=jsonDict.keys();
+        Iterator<?> jsonDictIterator=jsonDict.keys();
 
 
         while (jsonDictIterator.hasNext())
         {
-            String key= jsonDictIterator.next();
+            String key= jsonDictIterator.next().toString();
             insert(key, (String) jsonDict.get(key));
         }
 
@@ -47,7 +46,6 @@ public class AutoCorrectTrie {
 
 
     public void setAutoCorrectLoader(AutoCorrectLoader autoCorrectLoader) throws Exception {
-        this.autoCorrectLoader= autoCorrectLoader;
         init(autoCorrectLoader);
     }
 

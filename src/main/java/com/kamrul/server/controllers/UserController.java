@@ -10,8 +10,6 @@ import com.kamrul.server.repositories.*;
 import com.kamrul.server.utils.Converters;
 import com.kamrul.server.utils.Message;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,8 +30,6 @@ public class UserController {
     private UserRepository userRepository;
     @Autowired
     private PostRepository postRepository;
-    @Autowired
-    private MedalRepository medalRepository;
     @Autowired
     private BookletRepository bookletRepository;
     @Autowired

@@ -1,7 +1,6 @@
 package com.kamrul.server.services.verify;
 
 import com.kamrul.server.dto.PostDTO;
-import com.kamrul.server.models.post.Post;
 import com.kamrul.server.services.draftJS.DraftJSTextParsing;
 import com.kamrul.server.services.verify.exception.VerificationException;
 import org.springframework.beans.factory.annotation.Autowired;

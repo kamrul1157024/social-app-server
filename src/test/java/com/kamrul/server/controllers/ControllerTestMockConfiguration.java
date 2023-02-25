@@ -1,7 +1,5 @@
 package com.kamrul.server.controllers;
 
-import com.kamrul.server.politicalPostFilter.FilterPost;
-import com.kamrul.server.services.draftJS.DraftJSTextParsing;
 import com.kamrul.server.services.verify.PostVerifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
