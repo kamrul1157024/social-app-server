@@ -2,7 +2,7 @@ text-analyzer-server: http://text-analyzer:8000/api
 
 spring:
   datasource:
-    url: jdbc:postgresql://db:5432/social_media
+    url: jdbc:postgresql://app-database:5432/social_media
     username: postgres
     password: 10242048
 
