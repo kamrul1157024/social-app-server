@@ -12,7 +12,7 @@ RUN apt-get update && \
 
 RUN apt-get install -y curl
 
-WORkDIR /app/server
+WORKDIR /app/server
 COPY . /app/server
 
 RUN mvn clean install -DskipTests
