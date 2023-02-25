@@ -1,10 +1,7 @@
 package com.kamrul.server.phoneticParser.avro;
 
 import org.junit.Ignore;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 @Ignore("need to fix the digest parser")
 class PhoneticParserTest {

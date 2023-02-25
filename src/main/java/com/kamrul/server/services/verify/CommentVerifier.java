@@ -1,7 +1,6 @@
 package com.kamrul.server.services.verify;
 
 import com.kamrul.server.dto.CommentDTO;
-import com.kamrul.server.models.comment.Comment;
 import com.kamrul.server.services.draftJS.DraftJSTextParsing;
 import com.kamrul.server.services.verify.exception.VerificationException;
 import org.springframework.beans.factory.annotation.Autowired;

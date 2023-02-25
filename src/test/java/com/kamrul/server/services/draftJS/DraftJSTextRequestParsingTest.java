@@ -1,7 +1,5 @@
 package com.kamrul.server.services.draftJS;
 
-import com.kamrul.server.services.FileReading;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

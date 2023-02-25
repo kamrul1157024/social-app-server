@@ -10,7 +10,6 @@ import java.util.List;
 public class AvroTrie {
 
     private final TrieNode head;
-    private PhoneticLoader phoneticLoader;
     private static volatile AvroTrie avroTrie=null;
 
     private void init(PhoneticLoader phoneticLoader) throws Exception {
@@ -44,7 +43,6 @@ public class AvroTrie {
 
 
     public void setPhoneticLoader(PhoneticLoader phoneticLoader) throws Exception {
-        this.phoneticLoader = phoneticLoader;
         init(phoneticLoader);
     }
 
